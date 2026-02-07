@@ -17,11 +17,11 @@
 - [x] 环境变量解析
 - [x] 内置预设加载
 
-### 2.2 AI Agent服务
+### 2.2 AI Agent服务 ✅
 
-- [ ] 实现 `PlatformService` 类
-- [ ] AI Agent CRUD 操作
-- [ ] 路径变量替换
+- [x] 实现 `PlatformService` 类
+- [x] AI Agent CRUD 操作
+- [x] 路径变量替换
 
 ### 2.3 Git 服务
 
