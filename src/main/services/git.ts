@@ -1,5 +1,5 @@
 
-import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
+import simpleGit, { SimpleGit } from 'simple-git';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -14,7 +14,7 @@ export class GitService {
     try {
       await this.git.version();
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

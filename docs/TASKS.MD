@@ -8,7 +8,7 @@
 - [x] 配置 ESLint + Prettier
 - [x] 创建基础目录结构
 
-## Phase 2: 核心服务层
+## Phase 2: 核心服务层 ✅
 
 ### 2.1 配置服务 ✅
 
@@ -43,12 +43,12 @@
 - [x] 实现 `RuleDeployService` 类
 - [x] 内容合并策略
 
-## Phase 3: IPC 通信层
+## Phase 3: IPC 通信层 ✅
 
-- [ ] 定义 IPC Channel 常量
-- [ ] 实现 Main 进程 IPC 处理器
-- [ ] 实现 Renderer 进程 IPC 客户端
-- [ ] 类型安全的 IPC 封装
+- [x] 定义 IPC Channel 常量
+- [x] 实现 Main 进程 IPC 处理器
+- [x] 实现 Renderer 进程 IPC 客户端
+- [x] 类型安全的 IPC 封装
 
 ## Phase 4: 前端界面
 
