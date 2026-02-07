@@ -1,6 +1,6 @@
-# Skills Manager
+# Agent Context Manager (ACM)
 
-跨平台 AI Skills/Rules 管理工具，支持 Windows / macOS / Linux。
+跨平台 AI Agent 上下文 (Skills/Rules) 管理工具，支持 Windows / macOS / Linux。
 
 ## 功能特性
 
@@ -12,7 +12,7 @@
 
 ### Windows
 
-1. 下载 `SkillsManager-x.x.x-win.exe`
+1. 下载 `AgentContextManager-x.x.x-win.exe`
 2. 双击运行安装程序
 3. 首次启动时会请求**管理员权限**（创建符号链接所需）
    - 如拒绝授权，请手动开启「开发者模式」：
@@ -23,14 +23,14 @@
 > [!IMPORTANT]
 > 本应用未经 Apple 签名，需手动允许运行。
 
-1. 下载 `SkillsManager-x.x.x-mac.dmg`
+1. 下载 `AgentContextManager-x.x.x-mac.dmg`
 2. 打开 DMG 并拖拽到 Applications 文件夹
 3. **首次运行前**，执行以下任一操作：
 
 #### 方式一：终端命令（推荐）
 
 ```bash
-xattr -cr /Applications/SkillsManager.app
+xattr -cr /Applications/AgentContextManager.app
 ```
 
 #### 方式二：系统偏好设置
@@ -41,11 +41,11 @@ xattr -cr /Applications/SkillsManager.app
 
 ### Linux
 
-1. 下载 `SkillsManager-x.x.x-linux.AppImage`
+1. 下载 `AgentContextManager-x.x.x-linux.AppImage`
 2. 添加执行权限：
 
    ```bash
-   chmod +x SkillsManager-x.x.x-linux.AppImage
+   chmod +x AgentContextManager-x.x.x-linux.AppImage
    ```
 
 3. 运行应用

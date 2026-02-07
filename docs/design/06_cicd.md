@@ -110,7 +110,7 @@ jobs:
 # electron-builder.yml
 
 appId: com.skillsmanager.app
-productName: Skills Manager
+productName: Agent Context Manager
 directories:
   output: dist
   buildResources: resources

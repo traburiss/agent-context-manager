@@ -1,4 +1,4 @@
-# Skills Manager 开发任务计划
+# Agent Context Manager 开发任务计划
 
 ## Phase 1: 项目初始化
 

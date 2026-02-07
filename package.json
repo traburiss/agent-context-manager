@@ -1,0 +1,80 @@
+{
+  "name": "agent-context-manager",
+  "version": "0.1.0",
+  "description": "跨平台 AI Agent 上下文 (Skills/Rules) 管理工具",
+  "type": "module",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:electron": "tsc -p tsconfig.main.json && cross-env NODE_ENV=development electron .",
+    "build": "tsc && vite build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:all": "pnpm build:main && pnpm build",
+    "lint": "eslint src --ext ts,tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "package": "pnpm build:all && electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "skills",
+    "ai",
+    "agent",
+    "context",
+    "manager",
+    "rules"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.2",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.2.1",
+    "@types/react": "^19.2.13",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.24",
+    "cross-env": "^10.1.0",
+    "electron": "^40.2.1",
+    "electron-builder": "^26.7.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "postcss": "^8.5.6",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.54.0",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "build": {
+    "appId": "com.agentcontextmanager.app",
+    "productName": "Agent Context Manager",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json",
+      "resources/**/*"
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "resources/icon.png"
+    },
+    "nsis": {
+      "oneClick": false, 
+      "allowElevation": true, 
+      "allowToChangeInstallationDirectory": true 
+    },  
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "resources/icon.png"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "resources/icon.png"
+    }
+  }
+}

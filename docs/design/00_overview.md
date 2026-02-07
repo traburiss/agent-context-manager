@@ -1,8 +1,8 @@
-# Skills Manager 详细设计
+# Agent Context Manager 详细设计
 
 ## 项目概述
 
-Skills Manager 是一个跨平台的 AI Skills/Rules 管理工具，基于 Electron 实现，支持 Windows/macOS/Linux。
+Agent Context Manager 是一个跨平台的 AI Agent 上下文 (Skills/Rules) 管理工具，基于 Electron 实现，支持 Windows/macOS/Linux。
 
 ## 技术架构
 

@@ -1,0 +1,16 @@
+node_modules
+*.idea
+*.iml
+*.log
+*.lock
+*.bin
+*.jar
+*.class
+*.pyc
+*.DS_Store
+.vscode
+*.vs
+dist/*
+release/*
+.agent/*
+dist/*

@@ -1,6 +1,6 @@
-# 目标
+# Agent Context Manager (ACM)
 
-skills/rules 管理管理工具
+AI Agent Context (Skills/Rules) 管理工具
 
 ## 目标功能
 
