@@ -23,25 +23,25 @@
 - [x] AI Agent CRUD 操作
 - [x] 路径变量替换
 
-### 2.3 Git 服务
+### 2.3 Git 服务 ✅
 
-- [ ] 实现 `GitService` 类
-- [ ] Git 检测
-- [ ] 仓库克隆/拉取
-- [ ] URL 规范化
-- [ ] 更新检查 (`checkForUpdates`/`checkAllUpdates`)
+- [x] 实现 `GitService` 类
+- [x] Git 检测
+- [x] 仓库克隆/拉取
+- [x] URL 规范化
+- [x] 更新检查 (`checkForUpdates`/`checkAllUpdates`)
 
-### 2.4 符号链接服务
+### 2.4 符号链接服务 ✅
 
-- [ ] 实现 `SymlinkService` 类
-- [ ] Windows junction 创建
-- [ ] 权限检测与提示
+- [x] 实现 `SymlinkService` 类
+- [x] Windows junction 创建
+- [x] 权限检测与提示
 
-### 2.5 Rules 服务
+### 2.5 Rules 服务 ✅
 
-- [ ] 实现 `RuleService` 类
-- [ ] 实现 `RuleDeployService` 类
-- [ ] 内容合并策略
+- [x] 实现 `RuleService` 类
+- [x] 实现 `RuleDeployService` 类
+- [x] 内容合并策略
 
 ## Phase 3: IPC 通信层
 

@@ -12,7 +12,8 @@
     "build:all": "pnpm build:main && pnpm build",
     "lint": "eslint src --ext ts,tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "package": "pnpm build:all && electron-builder"
+    "package": "pnpm build:all && electron-builder",
+    "test": "vitest"
   },
   "keywords": [
     "electron",
@@ -51,7 +52,8 @@
     "fs-extra": "^11.3.3",
     "js-yaml": "^4.1.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "simple-git": "^3.30.0"
   },
   "build": {
     "appId": "com.agentcontextmanager.app",

@@ -4,6 +4,8 @@ export interface Platform {
   skillsDir: string;
   rulesFile: string;
   enabled: boolean;
+  linkedSkills?: string[];
+  linkedRules?: string[];
 }
 
 export interface SkillRepo {
