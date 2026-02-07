@@ -1,0 +1,3 @@
+name: Claude Code
+skillsDir: '${HOME}/.claude/skills'
+rulesFile: '${HOME}/.claude/CLAUDE.MD'

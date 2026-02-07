@@ -1,0 +1,3 @@
+name: Antigravity
+skillsDir: '${HOME}/.gemini/antigravity/skills'
+rulesFile: '${HOME}/.gemini/antigravity/AGENTS.MD'

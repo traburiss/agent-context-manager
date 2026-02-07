@@ -33,10 +33,31 @@ export interface Rule {
   linkedPlatforms: string[];
 }
 
+
 export interface UpdateCheckResult {
   repoId: string;
   hasUpdates: boolean;
   behindCount: number;
   aheadCount: number;
   error?: string;
+}
+
+export interface GlobalConfig {
+  version: number;
+  gitPath?: string;
+  theme?: 'light' | 'dark' | 'system';
+  language?: 'zh-CN' | 'en-US';
+}
+
+export interface PlatformConfig {
+  name: string;
+  skillsDir: string;
+  rulesFile: string;
+  enabled: boolean;
+  linkedSkills: string[];
+  linkedRules: string[];
+}
+
+export interface PlatformPreset extends Omit<PlatformConfig, 'enabled' | 'linkedSkills' | 'linkedRules'> {
+  description?: string;
 }

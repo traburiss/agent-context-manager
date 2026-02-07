@@ -1,21 +1,21 @@
 # Agent Context Manager 开发任务计划
 
-## Phase 1: 项目初始化
+## Phase 1: 项目初始化 ✅
 
-- [ ] 使用 Vite + Electron 模板初始化项目
-- [ ] 配置 TypeScript 5.9 严格模式
-- [ ] 配置 Tailwind CSS v4
-- [ ] 配置 ESLint + Prettier
-- [ ] 创建基础目录结构
+- [x] 使用 Vite + Electron 模板初始化项目
+- [x] 配置 TypeScript 5.9 严格模式
+- [x] 配置 Tailwind CSS v4
+- [x] 配置 ESLint + Prettier
+- [x] 创建基础目录结构
 
 ## Phase 2: 核心服务层
 
-### 2.1 配置服务
+### 2.1 配置服务 ✅
 
-- [ ] 实现 `ConfigService` 类
-- [ ] YAML 配置读写
-- [ ] 环境变量解析
-- [ ] 内置预设加载
+- [x] 实现 `ConfigService` 类
+- [x] YAML 配置读写
+- [x] 环境变量解析
+- [x] 内置预设加载
 
 ### 2.2 AI Agent服务
 

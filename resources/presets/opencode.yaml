@@ -1,0 +1,3 @@
+name: OpenCode
+skillsDir: '${HOME}/.opencode/skills'
+rulesFile: '${HOME}/.opencode/rules.md'
