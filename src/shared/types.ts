@@ -31,10 +31,11 @@ export interface Skill {
 export interface Rule {
   id: string;
   name: string;
+  description?: string;
   localPath: string;
   linkedPlatforms: string[];
+  createdAt: string;
 }
-
 
 export interface UpdateCheckResult {
   repoId: string;
@@ -49,6 +50,7 @@ export interface GlobalConfig {
   gitPath?: string;
   theme?: 'light' | 'dark' | 'system';
   language?: 'zh-CN' | 'en-US';
+  skillsRepos?: string[];
 }
 
 export interface PlatformConfig {

@@ -40,7 +40,8 @@ export enum IpcChannels {
   
   // App
   OpenExternal = 'app:open-external',
-  SelectDirectory = 'app:select-directory'
+  SelectDirectory = 'app:select-directory',
+  SelectFile = 'app:select-file'
 }
 
 // Request/Response Types
@@ -72,7 +73,7 @@ export interface IpcApi {
   // Rule
   [IpcChannels.ListRules]: () => Promise<Rule[]>;
   [IpcChannels.GetRule]: (id: string) => Promise<Rule | null>;
-  [IpcChannels.CreateRule]: (rule: Omit<Rule, 'id'>) => Promise<Rule>;
+  [IpcChannels.CreateRule]: (rule: Omit<Rule, 'id' | 'createdAt' | 'localPath' | 'linkedPlatforms'> & { localPath?: string; linkedPlatforms?: string[] }) => Promise<Rule>;
   [IpcChannels.UpdateRule]: (rule: Rule) => Promise<Rule>;
   [IpcChannels.DeleteRule]: (id: string) => Promise<void>;
   [IpcChannels.GetRuleContent]: (id: string) => Promise<string>;
@@ -84,4 +85,5 @@ export interface IpcApi {
   // App
   [IpcChannels.OpenExternal]: (url: string) => Promise<void>;
   [IpcChannels.SelectDirectory]: () => Promise<string | null>;
+  [IpcChannels.SelectFile]: (filterName?: string, extensions?: string[]) => Promise<string | null>;
 }

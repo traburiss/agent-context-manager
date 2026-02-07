@@ -2,7 +2,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RuleService } from '../../../src/main/services/rule';
 import fs from 'fs-extra';
-import path from 'path';
 import yaml from 'js-yaml';
 
 vi.mock('fs-extra');

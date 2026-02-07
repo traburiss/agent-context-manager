@@ -27,7 +27,7 @@ export class RuleService {
     return rules.find(r => r.id === id) || null;
   }
 
-  async create(ruleData: Omit<Rule, 'id'>): Promise<Rule> {
+  async create(ruleData: Omit<Rule, 'id' | 'createdAt' | 'localPath' | 'linkedPlatforms'> & { localPath?: string; linkedPlatforms?: string[] }): Promise<Rule> {
     const rules = await this.list();
     const id = this.generateId(ruleData.name);
     
@@ -35,9 +35,14 @@ export class RuleService {
       throw new Error(`Rule with ID ${id} already exists`);
     }
 
+    const localPath = ruleData.localPath || path.join(this.configDir, 'rules', `${id}.md`);
+
     const newRule: Rule = {
+      linkedPlatforms: [],
       ...ruleData,
-      id
+      id,
+      localPath,
+      createdAt: new Date().toISOString()
     };
 
     rules.push(newRule);

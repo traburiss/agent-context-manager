@@ -80,4 +80,16 @@ export function registerIpcHandlers(baseDir: string) {
     }
     return result.filePaths[0];
   });
+
+  handle(IpcChannels.SelectFile, async (filterName, extensions) => {
+    const filters = filterName && extensions ? [{ name: filterName, extensions }] : [];
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters
+    });
+    if (result.canceled) {
+      return null;
+    }
+    return result.filePaths[0];
+  });
 }

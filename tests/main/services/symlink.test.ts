@@ -2,7 +2,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SymlinkService } from '../../../src/main/services/symlink';
 import fs from 'fs-extra';
-import path from 'path';
 import os from 'os';
 
 // Mock fs-extra

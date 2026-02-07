@@ -1,8 +1,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RuleDeployService } from '../../../src/main/services/rule-deploy';
-import { PlatformService } from '../../../src/main/services/platform';
-import { RuleService } from '../../../src/main/services/rule';
 import fs from 'fs-extra';
 
 vi.mock('fs-extra');
