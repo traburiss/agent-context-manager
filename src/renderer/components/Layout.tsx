@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Layout as ArcoLayout, Tabs, Button, PageHeader, Radio } from '@arco-design/web-react';
+import { Layout as ArcoLayout, Tabs, Button, PageHeader, Space } from '@arco-design/web-react';
 import { IconSettings } from '@arco-design/web-react/icon';
 import { useTranslation } from 'react-i18next';
 import { SettingsModal } from './SettingsModal';
@@ -22,15 +22,14 @@ export function Layout() {
   };
 
   return (
-    <ArcoLayout className="h-screen flex flex-col">
-      <Header className="border-b border-gray-200 dark:border-gray-700">
+    <ArcoLayout >
+      <Header>
         <PageHeader
           title={t('common.appName')}
           subTitle={<Tabs 
                activeTab={activeTab} 
                onChange={handleTabChange}
                type="text"
-               className="nav-tabs h-full"
             >
                 <TabPane key="/agents" title={t('nav.agents')} />
                 <TabPane key="/skills" title={t('nav.skills')} />

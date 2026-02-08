@@ -1,7 +1,9 @@
 import { Modal, Tabs, Form, Radio, Button, Typography, Space, Message, Input } from '@arco-design/web-react';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { IconGithub, IconDownload, IconFolder, IconInfoCircle } from '@arco-design/web-react/icon';
+import { IconGithub, IconDownload, IconFolder } from '@arco-design/web-react/icon';
+import { useStore } from '../stores/useStore';
+import { SystemConfig } from '../../shared/types';
 
 interface SettingsModalProps {
   visible: boolean;
@@ -9,39 +11,22 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ visible, onCancel }: SettingsModalProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [systemConfig, setSystemConfig] = useState<{
-    baseDir: string;
-    language: string;
-    theme: string;
-  } | null>(null);
+  const { systemConfig, updateSystemConfig } = useStore();
   const [appVersion, setAppVersion] = useState<string>('');
 
   useEffect(() => {
     if (visible) {
-      loadConfig();
       loadVersion();
+      if (systemConfig) {
+        form.setFieldsValue({
+          language: systemConfig.language || 'zh-CN',
+          theme: systemConfig.theme || 'system'
+        });
+      }
     }
-  }, [visible]);
-
-  const loadConfig = async () => {
-    try {
-      const config = await window.api['config:get-system']();
-      setSystemConfig({
-        baseDir: config.baseDir,
-        language: config.language || 'zh-CN',
-        theme: config.theme || 'system'
-      });
-      form.setFieldsValue({
-        language: config.language || 'zh-CN',
-        theme: config.theme || 'system'
-      });
-    } catch (error) {
-      console.error('Failed to load system config:', error);
-      Message.error(t('settings.loadError'));
-    }
-  };
+  }, [visible, systemConfig]);
 
   const loadVersion = async () => {
     try {
@@ -56,11 +41,8 @@ export function SettingsModal({ visible, onCancel }: SettingsModalProps) {
     const path = await window.api['app:select-directory']();
     if (path) {
       try {
-        await window.api['config:set-system']({ baseDir: path });
-        setSystemConfig(prev => prev ? { ...prev, baseDir: path } : null);
+        await updateSystemConfig({ baseDir: path });
         Message.success(t('settings.baseDirUpdated'));
-        // Reload strictly might be needed if baseDir affects other services heavily
-        // For now, config update is enough as services read from config
       } catch (error) {
         console.error('Failed to update base dir:', error);
         Message.error(t('settings.updateError'));
@@ -68,28 +50,13 @@ export function SettingsModal({ visible, onCancel }: SettingsModalProps) {
     }
   };
 
-  const handleConfigChange = async (partialConfig: { language?: string; theme?: string }) => {
+  const handleConfigChange = async (partialConfig: Partial<SystemConfig>) => {
     try {
-       // Optimistic update
-       setSystemConfig(prev => prev ? { ...prev, ...partialConfig } : null);
-       
-       // If language changed, apply immediately
-       if (partialConfig.language) {
-          await i18n.changeLanguage(partialConfig.language);
-       }
-       
-       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-       const configToSave: any = { ...partialConfig }
-       if (partialConfig.language) configToSave.language = partialConfig.language;
-       if (partialConfig.theme) configToSave.theme = partialConfig.theme;
-
-       await window.api['config:set-system'](configToSave);
+       await updateSystemConfig(partialConfig);
        Message.success(t('settings.saved'));
     } catch (error) {
        console.error('Failed to save config:', error);
        Message.error(t('settings.saveError'));
-       // Revert?
-       loadConfig();
     }
   }
 
