@@ -65,17 +65,10 @@ export default function Startup() {
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      height: '100vh',
-      padding: 24,
-      background: 'var(--color-bg-2)'
-    }}>
-      <Card style={{ width: 600, maxWidth: '100%', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 600, margin: '0 0 8px 0' }}>
+    <div className="flex items-center justify-center h-screen p-6 bg-bg-2">
+      <Card className="w-[600px] max-w-full shadow-lg">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-semibold m-0 mb-2">
             {t('startup.title')}
           </h2>
           <Typography.Text type="secondary">
@@ -83,13 +76,13 @@ export default function Startup() {
           </Typography.Text>
         </div>
 
-        <Steps current={currentStep} style={{ marginBottom: 40 }}>
+        <Steps current={currentStep} className="mb-10">
           <Step title={t('startup.envCheck')} icon={isLoading && currentStep === 0 ? <IconLoading /> : undefined} />
           <Step title={t('startup.configBaseDir')} />
           <Step title={t('startup.ready')} />
         </Steps>
 
-        <div style={{ minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="min-h-[200px] flex flex-col items-center justify-center">
           {/* Step 0: Environment Check */}
           {currentStep === 0 && (
             <>
@@ -112,22 +105,22 @@ export default function Startup() {
 
           {/* Step 1: Base Dir Selection */}
           {currentStep === 1 && (
-            <div style={{ width: '100%', maxWidth: 400 }}>
-              <Typography.Title heading={6} style={{ marginTop: 0 }}>
+            <div className="w-full max-w-[400px]">
+              <Typography.Title heading={6} className="mt-0">
                 {t('startup.selectBaseDirTitle')}
               </Typography.Title>
               <Typography.Paragraph type="secondary">
                  {t('startup.selectBaseDirDesc')}
               </Typography.Paragraph>
               
-              <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <Space direction="vertical" className="w-full" size="large">
                 <Input.Search
                   readOnly
                   value={baseDir}
                   placeholder={t('startup.selectBaseDirPlaceholder')}
                   searchButton={<IconFolder />}
                   onSearch={handleSelectDir}
-                  style={{ width: '100%' }}
+                  className="w-full"
                 />
                 
                 <Button 
@@ -153,7 +146,7 @@ export default function Startup() {
           )}
 
           {error && (
-            <div style={{ marginTop: 24, color: 'rgb(var(--red-6))' }}>
+            <div className="mt-6 text-red-600">
               {t('common.error')}: {error}
             </div>
           )}

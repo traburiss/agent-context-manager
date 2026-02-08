@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../stores/useStore';
 import { 
-    Grid, Card, Button, Modal, Form, 
+    Card, Button, Modal, Form, 
     Input, Message, Typography, Empty, 
     Popconfirm 
 } from '@arco-design/web-react';
@@ -12,7 +12,6 @@ import {
 import { Rule } from '../../shared/types';
 import { useTranslation } from 'react-i18next';
 
-const { Row, Col } = Grid;
 const FormItem = Form.Item;
 const TextArea = Input.TextArea;
 
@@ -93,8 +92,8 @@ export default function Rules() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <Typography.Title heading={4} style={{ margin: 0 }}>
+      <div className="flex items-center justify-between mb-6">
+        <Typography.Title heading={4} className="m-0">
             {t('rules.title')}
         </Typography.Title>
         <Button type="primary" icon={<IconPlus />} onClick={openCreateModal}>
@@ -102,15 +101,15 @@ export default function Rules() {
         </Button>
       </div>
 
-      <Row gutter={[24, 24]}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {rules.map((rule) => (
-          <Col span={8} key={rule.id} xs={24} sm={12} md={12} lg={8} xl={6}>
+          <div key={rule.id}>
             <Card
               hoverable
-              style={{ height: '100%' }}
+              className="h-full"
               title={
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <IconFile style={{ color: 'var(--color-primary-6)' }} />
+                <div className="flex items-center gap-2">
+                    <IconFile className="text-primary-6" />
                     <span>{rule.name}</span>
                 </div>
               }
@@ -126,21 +125,21 @@ export default function Rules() {
                 </Popconfirm>
               ]}
             >
-                <div style={{ display: 'flex', flexDirection: 'column', minHeight: 80 }}>
+                <div className="flex flex-col min-h-[80px]">
                     <Typography.Paragraph 
-                        style={{ color: 'var(--color-text-3)', marginBottom: 16, flex: 1 }} 
+                        className="text-text-3 mb-4 flex-1"
                         ellipsis={{ rows: 3 }}
                     >
                         {rule.description || t('rules.noDescription')}
                     </Typography.Paragraph>
-                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                    <Typography.Text type="secondary" className="text-xs">
                         {t('rules.created', { date: new Date(rule.createdAt).toLocaleDateString() })}
                     </Typography.Text>
                 </div>
             </Card>
-          </Col>
+          </div>
         ))}
-      </Row>
+      </div>
 
       {rules.length === 0 && (
           <Empty description={t('rules.noRules')} />
@@ -153,7 +152,7 @@ export default function Rules() {
         onCancel={() => setIsModalOpen(false)}
         confirmLoading={isSaving}
         unmountOnExit
-        style={{ width: 600 }}
+        className="w-[600px]"
       >
           <Form form={form} layout="vertical">
               <FormItem label={t('rules.name')} field="name" rules={[{ required: true }]}>
@@ -166,7 +165,7 @@ export default function Rules() {
                   <TextArea 
                     placeholder={t('rules.contentPlaceholder')}
                     autoSize={{ minRows: 6, maxRows: 12 }}
-                    style={{ fontFamily: 'monospace' }}
+                    className="font-mono"
                   />
               </FormItem>
           </Form>

@@ -21,6 +21,23 @@
     "skills": "技能库",
     "rules": "规则"
   },
+  "settings": {
+    "title": "设置",
+    "general": "通用",
+    "about": "关于",
+    "baseDir": "基础目录",
+    "theme": "主题",
+    "themeLight": "亮色",
+    "themeDark": "暗色",
+    "themeSystem": "跟随系统",
+    "language": "语言",
+    "loadError": "加载配置失败",
+    "baseDirUpdated": "基础目录已更新",
+    "updateError": "更新配置失败",
+    "saved": "保存成功",
+    "saveError": "保存失败",
+    "download": "下载页面"
+  },
   "startup": {
     "title": "初始化 Agent Context Manager",
     "subtitle": "您的本地 AI 环境",

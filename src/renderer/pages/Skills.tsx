@@ -13,15 +13,15 @@ import { useTranslation } from 'react-i18next';
 const FormItem = Form.Item;
 
 export default function Skills() {
-  const { config, fetchConfig, updateConfig } = useStore();
+  const { userConfig, fetchUserConfig } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [isAdding, setIsAdding] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
-    fetchConfig();
-  }, [fetchConfig]);
+    fetchUserConfig();
+  }, [fetchUserConfig]);
 
   const handleAddRepo = async () => {
     try {
@@ -30,16 +30,17 @@ export default function Skills() {
 
         const normalized = await window.api['git:normalize-url'](values.url);
         
-        const currentRepos = config?.skillsRepos || [];
-        if (currentRepos.includes(normalized)) {
+        const currentRepos = userConfig?.skills || [];
+        if (currentRepos.some(s => s.url === normalized || s.name === normalized)) {
             Message.warning(t('skills.repoExists'));
             return;
         }
 
-        await updateConfig({
-            skillsRepos: [...currentRepos, normalized]
-        });
-
+        if (!userConfig) return;
+        
+        await window.api['git:clone'](normalized);
+        
+        await fetchUserConfig();
         setIsModalOpen(false);
         form.resetFields();
         Message.success(t('skills.addSuccess'));
@@ -51,11 +52,24 @@ export default function Skills() {
     }
   };
 
-  const handleDelete = async (repo: string) => {
-      const currentRepos = config?.skillsRepos || [];
-      const newRepos = currentRepos.filter(r => r !== repo);
-      await updateConfig({ skillsRepos: newRepos });
-      Message.success(t('skills.removeSuccess'));
+  const handleDelete = async (repoUrl: string) => {
+    try {
+        if (!userConfig) return;
+        
+        // Find repo by URL to get ID
+        const repo = userConfig.skills.find(s => s.url === repoUrl);
+        if (!repo) {
+            Message.error(t('skills.repoNotFound'));
+            return;
+        }
+
+        await window.api['git:delete'](repo.id);
+        await fetchUserConfig();
+        Message.success(t('skills.deleteSuccess'));
+    } catch (error) {
+        console.error(error);
+        Message.error(t('skills.deleteFailed'));
+    }
   };
 
   const handleOpenExternal = (url: string) => {
@@ -64,8 +78,8 @@ export default function Skills() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <Typography.Title heading={4} style={{ margin: 0 }}>
+      <div className="flex items-center justify-between mb-6">
+        <Typography.Title heading={4} className="m-0">
             {t('skills.title')}
         </Typography.Title>
         <Button type="primary" icon={<IconPlus />} onClick={() => setIsModalOpen(true)}>
@@ -73,15 +87,10 @@ export default function Skills() {
         </Button>
       </div>
 
-      <div style={{ 
-        background: 'var(--color-bg-2)', 
-        borderRadius: 8, 
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        border: '1px solid var(--color-border-2)'
-      }}>
+      <div className="bg-bg-2 rounded-lg shadow-sm border border-border-2">
           <List
             noDataElement={<Empty description={t('skills.noRepos')} />}
-            dataSource={config?.skillsRepos || []}
+            dataSource={userConfig?.skills || []}
             render={(repo, index) => (
                 <List.Item
                     key={index}
@@ -90,20 +99,21 @@ export default function Skills() {
                             key="open" 
                             type="text" 
                             icon={<IconLaunch />} 
-                            onClick={() => handleOpenExternal(repo)}
+                            onClick={() => handleOpenExternal(repo.url)}
                         />,
                         <Popconfirm
                             key="delete"
                             title={t('skills.deleteRepo')}
-                            onOk={() => handleDelete(repo)}
+                            onOk={() => handleDelete(repo.url)}
                         >
                             <Button type="text" status="danger" icon={<IconDelete />} />
                         </Popconfirm>
                     ]}
                 >
                     <List.Item.Meta
-                        avatar={<IconBranch style={{ fontSize: 20, color: 'var(--color-text-3)' }} />}
-                        title={repo}
+                        avatar={<IconBranch className="text-xl text-text-3" />}
+                        title={repo.name}
+                        description={repo.url !== repo.name ? repo.url : undefined}
                     />
                 </List.Item>
             )}

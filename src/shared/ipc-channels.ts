@@ -48,7 +48,8 @@ export enum IpcChannels {
   // App
   OpenExternal = 'app:open-external',
   SelectDirectory = 'app:select-directory',
-  SelectFile = 'app:select-file'
+  SelectFile = 'app:select-file',
+  GetAppVersion = 'app:get-version' // Added
 }
 
 // Request/Response Types
@@ -100,4 +101,5 @@ export interface IpcApi {
   [IpcChannels.OpenExternal]: (url: string) => Promise<void>;
   [IpcChannels.SelectDirectory]: () => Promise<string | null>;
   [IpcChannels.SelectFile]: (filterName?: string, extensions?: string[]) => Promise<string | null>;
+  [IpcChannels.GetAppVersion]: () => Promise<string>; // Added
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../stores/useStore';
 import { 
-    Grid, Card, Button, Switch, Modal, 
+    Card, Button, Switch, Modal, 
     Form, Input, Message, Typography, 
     Empty, Popconfirm 
 } from '@arco-design/web-react';
@@ -11,7 +11,6 @@ import {
 import { Platform } from '../../shared/types';
 import { useTranslation } from 'react-i18next';
 
-const { Row, Col } = Grid;
 const FormItem = Form.Item;
 
 export default function Agents() {
@@ -83,8 +82,8 @@ export default function Agents() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <Typography.Title heading={4} style={{ margin: 0 }}>
+      <div className="flex items-center justify-between mb-6">
+        <Typography.Title heading={4} className="m-0">
             {t('agents.title')}
         </Typography.Title>
         <Button type="primary" icon={<IconPlus />} onClick={() => setIsModalOpen(true)}>
@@ -92,10 +91,11 @@ export default function Agents() {
         </Button>
       </div>
 
-      <Row gutter={[24, 24]}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {platforms.map((platform) => (
-          <Col span={8} key={platform.id} xs={24} sm={12} md={12} lg={8} xl={6}>
+          <div key={platform.id}>
             <Card
+              className="h-full"
               title={platform.name}
               extra={
                 <Switch 
@@ -116,20 +116,20 @@ export default function Agents() {
                 </Popconfirm>
               ]}
             >
-              <div style={{ minHeight: 80 }}>
-                <Typography.Paragraph style={{ fontSize: 12, color: 'var(--color-text-3)', marginBottom: 8 }}>
-                  <IconFolder style={{ marginRight: 4 }} />
+              <div className="min-h-[80px]">
+                <Typography.Paragraph className="text-xs text-text-3 mb-2">
+                  <IconFolder className="mr-1" />
                   {platform.skillsDir}
                 </Typography.Paragraph>
-                <Typography.Paragraph style={{ fontSize: 12, color: 'var(--color-text-3)' }}>
-                  <IconFile style={{ marginRight: 4 }} />
+                <Typography.Paragraph className="text-xs text-text-3">
+                  <IconFile className="mr-1" />
                   {platform.rulesFile}
                 </Typography.Paragraph>
               </div>
             </Card>
-          </Col>
+          </div>
         ))}
-      </Row>
+      </div>
 
       {platforms.length === 0 && (
           <Empty description={t('agents.noAgents')} />
@@ -153,7 +153,7 @@ export default function Agents() {
                     suffix={<Button size="small" onClick={selectDir}>{t('common.select')}</Button>}
                   />
               </FormItem>
-              <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginTop: -16, marginBottom: 16 }}>
+              <Typography.Text type="secondary" className="text-xs block -mt-4 mb-4">
                   {t('agents.skillsDirDesc')}
               </Typography.Text>
               <FormItem label={t('agents.rulesFile')} field="rulesFile" rules={[{ required: true }]}>
@@ -162,7 +162,7 @@ export default function Agents() {
                     suffix={<Button size="small" onClick={selectFile}>{t('common.select')}</Button>}
                   />
               </FormItem>
-              <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginTop: -16 }}>
+              <Typography.Text type="secondary" className="text-xs block -mt-4">
                   {t('agents.rulesFileDesc')}
               </Typography.Text>
           </Form>

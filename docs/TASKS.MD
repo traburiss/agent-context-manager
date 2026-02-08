@@ -92,13 +92,27 @@
 - [x] 初始化向导 (Base Dir 选择)
 - [x] 国际化 (i18n) 支持
 
-### 4.2 主界面框架
+### 4.2 主界面框架 ✅
 
-- [ ] **Layout 组件**
-  - [ ] 顶部导航栏 (Logo + Tabs)
-  - [ ] 底部状态栏 (版本信息)
-- [ ] **全局状态 (useStore)**
-  - [ ] 集成 Platform, Skills, Rules 状态
+> 参考: [Design 07_ui_layout](docs/design/07_ui_layout.md)
+
+- [x] **Layout 组件**
+  - [x] 顶部导航栏 (Header)
+    - [x] 左侧: Tabs (AI AGENT | SKILLS | RULES)
+    - [x] 右侧: 设置按钮
+  - [x] 内容区域 (Content Outlet)
+- [x] **设置 (Settings) 模块**
+  - [x] 设置弹窗/抽屉组件
+  - [x] **通用设置**
+    - [x] Base Dir 重设/切换
+    - [x] 主题切换 (Light/Dark/System)
+    - [x] 语言切换 (zh-CN/en-US)
+  - [x] **关于信息**
+    - [x] 版本号显示
+    - [x] GitHub 链接
+    - [x] 下载页面链接
+- [x] **全局状态 (useStore)**
+  - [x] 集成 Platform, Skills, Rules 状态
 
 ### 4.3 AI Agent管理 (Agents Tab)
 

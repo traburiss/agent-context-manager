@@ -88,3 +88,4 @@ SkillsManager/
 | [04_rules.md](./04_rules.md) | Rules 管理 |
 | [05_config.md](./05_config.md) | 配置系统 |
 | [06_cicd.md](./06_cicd.md) | CI/CD 构建 |
+| [07_ui_layout.md](./07_ui_layout.md) | 主界面布局 |
