@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../stores/useStore';
-import { Card, Steps, Result, Spin, Button, Input, Typography, Space } from '@arco-design/web-react';
+import { Card, Steps, Result, Spin, Button, Input, Typography, Space, Skeleton } from '@arco-design/web-react';
 import { IconLoading, IconFolder } from '@arco-design/web-react/icon';
 import { useTranslation } from 'react-i18next';
 import { IpcChannels } from '../../shared/ipc-channels';
@@ -13,7 +13,7 @@ export default function Startup() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(2);
   const [baseDir, setBaseDir] = useState('');
 
   useEffect(() => {
@@ -36,14 +36,14 @@ export default function Startup() {
 
     // Step 1: Check Base Dir
     // If system config is loaded and has baseDir, we are done
-    if (systemConfig?.baseDir) {
-      setCurrentStep(2);
-      setTimeout(() => navigate('/agents'), 1000);
+    if (!systemConfig?.baseDir) {
+      setCurrentStep(1);
       return;
     }
 
     // Otherwise, ask for Base Dir
-    setCurrentStep(1);
+    setCurrentStep(2);
+    navigate('/agents');
     
   }, [gitInstalled, isLoading, systemConfig, navigate]);
 
@@ -64,18 +64,15 @@ export default function Startup() {
     // updateSystemConfig will trigger re-fetch and effect will navigate
   };
 
+  if (currentStep === 2 || isLoading) {
+    return <Skeleton animation={true} />;
+  }
+
   return (
-    <div style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      height: '100vh',
-      padding: 24,
-      background: 'var(--color-bg-2)'
-    }}>
-      <Card style={{ width: 600, maxWidth: '100%', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 600, margin: '0 0 8px 0' }}>
+    <div className="flex items-center justify-center h-screen p-6 bg-bg-2">
+      <Card className="w-[600px] max-w-full shadow-lg">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-semibold m-0 mb-2">
             {t('startup.title')}
           </h2>
           <Typography.Text type="secondary">
@@ -83,13 +80,13 @@ export default function Startup() {
           </Typography.Text>
         </div>
 
-        <Steps current={currentStep} style={{ marginBottom: 40 }}>
+        <Steps current={currentStep} className="mb-10">
           <Step title={t('startup.envCheck')} icon={isLoading && currentStep === 0 ? <IconLoading /> : undefined} />
           <Step title={t('startup.configBaseDir')} />
           <Step title={t('startup.ready')} />
         </Steps>
 
-        <div style={{ minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="min-h-[200px] flex flex-col items-center justify-center">
           {/* Step 0: Environment Check */}
           {currentStep === 0 && (
             <>
@@ -112,22 +109,22 @@ export default function Startup() {
 
           {/* Step 1: Base Dir Selection */}
           {currentStep === 1 && (
-            <div style={{ width: '100%', maxWidth: 400 }}>
-              <Typography.Title heading={6} style={{ marginTop: 0 }}>
+            <div className="w-full max-w-[400px]">
+              <Typography.Title heading={6} className="mt-0">
                 {t('startup.selectBaseDirTitle')}
               </Typography.Title>
               <Typography.Paragraph type="secondary">
                  {t('startup.selectBaseDirDesc')}
               </Typography.Paragraph>
               
-              <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <Space direction="vertical" className="w-full" size="large">
                 <Input.Search
                   readOnly
                   value={baseDir}
                   placeholder={t('startup.selectBaseDirPlaceholder')}
                   searchButton={<IconFolder />}
                   onSearch={handleSelectDir}
-                  style={{ width: '100%' }}
+                  className="w-full"
                 />
                 
                 <Button 
@@ -153,7 +150,7 @@ export default function Startup() {
           )}
 
           {error && (
-            <div style={{ marginTop: 24, color: 'rgb(var(--red-6))' }}>
+            <div className="mt-6 text-red-600">
               {t('common.error')}: {error}
             </div>
           )}

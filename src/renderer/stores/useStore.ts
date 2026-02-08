@@ -1,11 +1,12 @@
 import { create } from 'zustand';
-import { SystemConfig, UserConfig, Platform, PlatformPreset, Rule } from '../../shared/types';
+import { SystemConfig, UserConfig, Platform, PlatformPreset, Rule, Skill } from '../../shared/types';
 import { IpcChannels } from '../../shared/ipc-channels';
 
 interface AppState {
   systemConfig: SystemConfig | null;
   userConfig: UserConfig | null;
   platforms: Platform[];
+  skills: Skill[]; // Added
   rules: Rule[];
   presets: PlatformPreset[];
   gitInstalled: boolean;
@@ -29,8 +30,12 @@ interface AppState {
   updatePlatform: (platform: Platform) => Promise<void>;
   deletePlatform: (id: string) => Promise<void>;
 
+  // Skills
+  fetchSkills: () => Promise<void>; // Added
+
   // Rules
   fetchRules: () => Promise<void>;
+  
   checkGit: () => Promise<void>;
 }
 
@@ -38,6 +43,7 @@ export const useStore = create<AppState>((set, get) => ({
   systemConfig: null,
   userConfig: null,
   platforms: [],
+  skills: [],
   rules: [],
   presets: [],
   gitInstalled: false,
@@ -49,15 +55,15 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       await get().checkGit();
       await get().fetchSystemConfig();
-      // Only fetch user config if baseDir is set, handled by fetchUserConfig or by system config load?
-      // Better to fetch explicitly.
+      
       const systemConfig = get().systemConfig;
       if (systemConfig?.baseDir) {
         await get().fetchUserConfig();
       }
 
       await Promise.all([
-        get().fetchPlatforms(), // PlatformService currently uses reading from disk, need to update PlatformService later.
+        get().fetchPlatforms(),
+        get().fetchSkills(), // Added
         get().fetchRules()
       ]);
       
@@ -84,12 +90,12 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       await window.api[IpcChannels.SetSystemConfig](config);
       await get().fetchSystemConfig();
-      // If baseDir changed, we should re-fetch user config
+      
       if (config.baseDir) {
         await get().fetchUserConfig();
-        // Also need to refresh platforms/rules as they depend on baseDir
         await Promise.all([
            get().fetchPlatforms(),
+           get().fetchSkills(), // Added refresh
            get().fetchRules()
         ]);
       }
@@ -151,6 +157,15 @@ export const useStore = create<AppState>((set, get) => ({
       await get().fetchPlatforms();
     } catch (error) {
       set({ error: (error as Error).message });
+    }
+  },
+
+  fetchSkills: async () => {
+    try {
+        const skills = await window.api[IpcChannels.ListSkills]();
+        set({ skills });
+    } catch (error) {
+        console.error('Failed to fetch skills', error);
     }
   },
 

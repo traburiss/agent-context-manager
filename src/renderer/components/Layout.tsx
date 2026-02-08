@@ -1,82 +1,62 @@
 import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Layout as ArcoLayout, Menu } from '@arco-design/web-react';
-import { IconRobot, IconApps, IconFile } from '@arco-design/web-react/icon';
+import { Layout as ArcoLayout, Tabs, Button, PageHeader, Radio } from '@arco-design/web-react';
+import { IconSettings } from '@arco-design/web-react/icon';
 import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from './LanguageSwitcher';
+import { SettingsModal } from './SettingsModal';
 
-const { Sider, Content } = ArcoLayout;
-const MenuItem = Menu.Item;
+const { Header, Content } = ArcoLayout;
+const TabPane = Tabs.TabPane;
 
 export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const [collapsed, setCollapsed] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
-  const menuItems = [
-    { key: '/agents', icon: <IconRobot />, label: t('nav.agents') },
-    { key: '/skills', icon: <IconApps />, label: t('nav.skills') },
-    { key: '/rules', icon: <IconFile />, label: t('nav.rules') }
-  ];
+  // Map routes to tab keys
+  const activeTab = location.pathname;
 
-  const handleMenuClick = (key: string) => {
+  const handleTabChange = (key: string) => {
     navigate(key);
   };
 
   return (
-    <ArcoLayout style={{ height: '100vh' }}>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={setCollapsed}
-        width={220}
-        style={{
-          boxShadow: '2px 0 8px rgba(0,0,0,0.1)'
-        }}
-      >
-        <div
-          style={{
-            height: 64,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: collapsed ? 14 : 16,
-            fontWeight: 600,
-            borderBottom: '1px solid var(--color-border-2)'
-          }}
-        >
-          {collapsed ? 'ACM' : t('common.appName')}
+    <ArcoLayout className="h-screen flex flex-col">
+      <Header className="border-b border-gray-200 dark:border-gray-700">
+        <PageHeader
+          title={t('common.appName')}
+          subTitle={<Tabs 
+               activeTab={activeTab} 
+               onChange={handleTabChange}
+               type="text"
+               className="nav-tabs h-full"
+            >
+                <TabPane key="/agents" title={t('nav.agents')} />
+                <TabPane key="/skills" title={t('nav.skills')} />
+                <TabPane key="/rules" title={t('nav.rules')} />
+            </Tabs>
+          }
+          extra={
+            <Button 
+                icon={<IconSettings />} 
+                type="text"
+                onClick={() => setSettingsVisible(true)}
+            >设置</Button>
+          }
+        />
+      </Header>
+
+      <Content className="p-0 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-auto pl-6 pr-6 pb-6">
+          <Outlet />
         </div>
-
-        <Menu
-          selectedKeys={[location.pathname]}
-          onClickMenuItem={handleMenuClick}
-          style={{ marginTop: 16 }}
-        >
-          {menuItems.map(item => (
-            <MenuItem key={item.key} style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ marginRight: 8 }}>{item.icon}</span>
-              {item.label}
-            </MenuItem>
-          ))}
-        </Menu>
-
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 16,
-            left: collapsed ? 16 : 24,
-            right: collapsed ? 16 : 24
-          }}
-        >
-          {!collapsed && <LanguageSwitcher />}
-        </div>
-      </Sider>
-
-      <Content style={{ padding: 24, overflow: 'auto' }}>
-        <Outlet />
       </Content>
+      
+      <SettingsModal 
+        visible={settingsVisible} 
+        onCancel={() => setSettingsVisible(false)} 
+      />
     </ArcoLayout>
   );
 }

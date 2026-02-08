@@ -17,9 +17,26 @@
     "warning": "Warning"
   },
   "nav": {
-    "agents": "Agents",
-    "skills": "Skills",
-    "rules": "Rules"
+    "agents": "AI AGENT",
+    "skills": "SKILLS",
+    "rules": "RULES"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "about": "About",
+    "baseDir": "Base Directory",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "language": "Language",
+    "loadError": "Failed to load config",
+    "baseDirUpdated": "Base directory updated",
+    "updateError": "Failed to update config",
+    "saved": "Saved successfully",
+    "saveError": "Failed to save",
+    "download": "Download Page"
   },
   "startup": {
     "title": "Initialize Agent Context Manager",

@@ -1,5 +1,5 @@
 
-import { ipcMain, shell, dialog } from 'electron';
+import { ipcMain, shell, dialog, app } from 'electron';
 import { IpcChannels } from '../../shared/ipc-channels.js';
 import { ConfigService } from '../services/config.js';
 import { PlatformService } from '../services/platform.js';
@@ -100,5 +100,9 @@ export function registerIpcHandlers(appDataPath: string) {
       return null;
     }
     return result.filePaths[0];
+  });
+
+  handle(IpcChannels.GetAppVersion, async () => {
+      return app.getVersion();
   });
 }

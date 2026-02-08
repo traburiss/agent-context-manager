@@ -49,7 +49,8 @@ const api: IpcApi = {
   // App
   [IpcChannels.OpenExternal]: (url) => ipcRenderer.invoke(IpcChannels.OpenExternal, url),
   [IpcChannels.SelectDirectory]: () => ipcRenderer.invoke(IpcChannels.SelectDirectory),
-  [IpcChannels.SelectFile]: (filterName, extensions) => ipcRenderer.invoke(IpcChannels.SelectFile, filterName, extensions)
+  [IpcChannels.SelectFile]: (filterName, extensions) => ipcRenderer.invoke(IpcChannels.SelectFile, filterName, extensions),
+  [IpcChannels.GetAppVersion]: () => ipcRenderer.invoke(IpcChannels.GetAppVersion)
 };
 
 contextBridge.exposeInMainWorld('api', api);

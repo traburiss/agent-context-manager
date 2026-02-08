@@ -2,7 +2,7 @@ import yaml from 'js-yaml';
 import fs from 'fs-extra';
 import path from 'path';
 import { app } from 'electron';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce.js';
 import { SystemConfig, UserConfig, PlatformConfig, SkillRepo, Rule, PlatformPreset } from '../../shared/types';
 
 const DEFAULT_SYSTEM_CONFIG: SystemConfig = {

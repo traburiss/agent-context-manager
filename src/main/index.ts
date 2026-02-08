@@ -24,7 +24,7 @@ function createWindow() {
   
   if (!app.isPackaged) {
     mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   } else {
     const indexPath = join(__dirname, '../renderer/index.html');
     console.log('Loading file:', indexPath);

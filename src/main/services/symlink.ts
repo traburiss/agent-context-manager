@@ -29,6 +29,7 @@ export class SymlinkService {
       await fs.ensureSymlink(target, linkPath, type);
     } catch (error) {
        // Check for admin rights error (heuristic)
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
        if ((error as any).code === 'EPERM') {
            throw new Error('Permission denied. Administrator rights might be required to create symbolic links.', { cause: error });
        }
