@@ -77,16 +77,14 @@ export function getGitInstallGuide(): Record<string, string> {
 
 ### 目录结构创建
 
-```typescript
-// src/main/services/config.ts
-import fs from 'fs-extra';
+### 目录结构初始化代码
+
 import path from 'path';
 
 export async function initBaseDir(baseDir: string): Promise<void> {
+  // 1. 确保目录存在
   const dirs = [
     'config',
-    'config/platforms',
-    'config/presets',
     'skills',
     'rules'
   ];
@@ -95,19 +93,26 @@ export async function initBaseDir(baseDir: string): Promise<void> {
     await fs.ensureDir(path.join(baseDir, dir));
   }
 
-  // 创建默认配置
-  const configPath = path.join(baseDir, 'config', 'config.yaml');
-  if (!await fs.pathExists(configPath)) {
-    await fs.writeFile(configPath, 'version: 1\n');
-  }
+  // 2. 初始化用户配置文件 (如果不存在)
+  const userConfigFiles = {
+    'ai-agent.yaml': '# AI AGENT CONFIGURATION\nagents: []\n',
+    'skills.yaml': '# SKILLS CONFIGURATION\nskills: []\n',
+    'rules.yaml': '# RULES CONFIGURATION\nrules: []\n'
+  };
 
-  // 复制内置预设
-  await copyBuiltinPresets(baseDir);
+  for (const [file, content] of Object.entries(userConfigFiles)) {
+    const filePath = path.join(baseDir, 'config', file);
+    if (!await fs.pathExists(filePath)) {
+      await fs.writeFile(filePath, content);
+    }
+  }
 }
+
 ```
 
 ## IPC 接口
 
+```text
 | Channel | Direction | 参数 | 返回值 |
 |---------|-----------|------|--------|
 | `app:check-elevation` | Renderer → Main | - | `boolean` |
@@ -115,3 +120,4 @@ export async function initBaseDir(baseDir: string): Promise<void> {
 | `app:get-base-dir` | Renderer → Main | - | `string \| null` |
 | `app:set-base-dir` | Renderer → Main | `baseDir: string` | `void` |
 | `app:init-base-dir` | Renderer → Main | `baseDir: string` | `void` |
+```

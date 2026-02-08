@@ -31,37 +31,23 @@ rules/
 └── ...
 ```
 
-## 服务实现
+### 服务实现
 
 ```typescript
 // src/main/services/rule.ts
+import { ConfigurationService } from './config/ConfigurationService';
 
 export class RuleService {
   private rulesDir: string;
 
-  constructor(baseDir: string) {
+  constructor(baseDir: string, private configService: ConfigurationService) {
     this.rulesDir = path.join(baseDir, 'rules');
   }
 
   async list(): Promise<Rule[]> {
-    const files = await fs.readdir(this.rulesDir);
-    const rules: Rule[] = [];
-
-    for (const file of files.filter(f => f.endsWith('.md'))) {
-      const filePath = path.join(this.rulesDir, file);
-      const stats = await fs.stat(filePath);
-
-      rules.push({
-        id: path.basename(file, '.md'),
-        name: path.basename(file, '.md'),
-        localPath: filePath,
-        linkedPlatforms: await this.getLinkedPlatforms(file),
-        createdAt: stats.birthtime.toISOString(),
-        updatedAt: stats.mtime.toISOString()
-      });
-    }
-
-    return rules;
+    // 从配置文件读取 Rules 元数据
+    const config = await this.configService.getUserConfig();
+    return config.rules;
   }
 
   async create(name: string, content: string = ''): Promise<Rule> {
@@ -75,7 +61,7 @@ export class RuleService {
     await fs.writeFile(filePath, content);
     const stats = await fs.stat(filePath);
 
-    return {
+    const newRule: Rule = {
       id: name,
       name,
       localPath: filePath,
@@ -83,22 +69,16 @@ export class RuleService {
       createdAt: stats.birthtime.toISOString(),
       updatedAt: stats.mtime.toISOString()
     };
+
+    // 更新配置文件
+    const config = await this.configService.getUserConfig();
+    config.rules.push(newRule);
+    await this.configService.saveUserConfig();
+
+    return newRule;
   }
 
-  async read(id: string): Promise<string> {
-    const filePath = path.join(this.rulesDir, `${id}.md`);
-    return await fs.readFile(filePath, 'utf-8');
-  }
-
-  async update(id: string, content: string): Promise<void> {
-    const filePath = path.join(this.rulesDir, `${id}.md`);
-    await fs.writeFile(filePath, content);
-  }
-
-  async delete(id: string): Promise<void> {
-    const filePath = path.join(this.rulesDir, `${id}.md`);
-    await fs.remove(filePath);
-  }
+  // ... 其他方法需同步更新 Config
 }
 ```
 

@@ -8,28 +8,29 @@
 - [x] 配置 ESLint + Prettier
 - [x] 创建基础目录结构
 
-## Phase 2: 核心服务层 ✅
+## Phase 2: 核心服务层 `[/]`
 
-### 2.1 配置服务 ✅
+> [!NOTE]
+> 当前核心服务已按初始设计实现，但需根据最新的**分层存储方案**（Split Storage）进行重构。
 
-- [x] 实现 `ConfigService` 类
-- [x] YAML 配置读写
-- [x] 环境变量解析
-- [x] 内置预设加载
+### 2.1 配置服务 `[/]`
 
-### 2.2 AI Agent服务 ✅
+- [x] 初始 `ConfigService` 实现 (Old)
+- [ ] **重构：实现分层配置逻辑 (Split Storage)**
+- [ ] 系统配置与用户配置分离读写
+- [ ] 异步去抖 (Debounce) 持久化
+- [ ] 配置文件头部注释注入
 
-- [x] 实现 `PlatformService` 类
-- [x] AI Agent CRUD 操作
-- [x] 路径变量替换
+### 2.2 AI Agent服务 `[/]`
 
-### 2.3 Git 服务 ✅
+- [x] 初始 `PlatformService` 实现 (Old)
+- [ ] **重构：适配单文件 `ai-agent.yaml` 存储**
+- [ ] 移除旧的 `platforms/` 文件夹逻辑
 
-- [x] 实现 `GitService` 类
-- [x] Git 检测
-- [x] 仓库克隆/拉取
-- [x] URL 规范化
-- [x] 更新检查 (`checkForUpdates`/`checkAllUpdates`)
+### 2.3 Git 服务 `[/]`
+
+- [x] 初始 `GitService` 实现 (Old)
+- [ ] **重构：集成新的配置 Service 管理 Skills 元数据**
 
 ### 2.4 符号链接服务 ✅
 
@@ -37,18 +38,16 @@
 - [x] Windows junction 创建
 - [x] 权限检测与提示
 
-### 2.5 Rules 服务 ✅
+### 2.5 Rules 服务 `[/]`
 
-- [x] 实现 `RuleService` 类
-- [x] 实现 `RuleDeployService` 类
-- [x] 内容合并策略
+- [x] 初始 `RuleService` 实现 (Old)
+- [ ] **重构：适配单文件 `rules.yaml` 元数据管理**
 
-## Phase 3: IPC 通信层 ✅
+## Phase 3: IPC 通信层 `[/]`
 
 - [x] 定义 IPC Channel 常量
-- [x] 实现 Main 进程 IPC 处理器
-- [x] 实现 Renderer 进程 IPC 客户端
-- [x] 类型安全的 IPC 封装
+- [ ] **重构：更新 Main 进程 IPC 处理器以调用新版 Service**
+- [ ] 实现类型安全的 IPC 客户端 (Renderer)
 
 ## Phase 4: 前端界面
 

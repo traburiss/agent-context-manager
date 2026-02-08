@@ -65,12 +65,13 @@ export function normalizeGitUrl(input: string): string {
 ```typescript
 // src/main/services/git.ts
 import simpleGit, { SimpleGit } from 'simple-git';
+import { ConfigurationService } from './config/ConfigurationService';
 
 export class GitService {
   private git: SimpleGit;
   private skillsDir: string;
 
-  constructor(baseDir: string) {
+  constructor(baseDir: string, private configService: ConfigurationService) {
     this.skillsDir = path.join(baseDir, 'skills');
     this.git = simpleGit();
   }
@@ -82,52 +83,23 @@ export class GitService {
 
     await this.git.clone(normalizedUrl, localPath);
 
-    return {
+    const newRepo: SkillRepo = {
       id: repoName,
       name: repoName,
       url: normalizedUrl,
       localPath,
       lastUpdated: new Date().toISOString()
     };
-  }
 
-  async pull(repoId: string): Promise<void> {
-    const localPath = path.join(this.skillsDir, repoId);
-    const git = simpleGit(localPath);
-    await git.pull();
-  }
+    // 更新配置文件
+    const config = await this.configService.getUserConfig();
+    config.skills.push(newRepo);
+    await this.configService.saveUserConfig();
 
-  async delete(repoId: string): Promise<void> {
-    const localPath = path.join(this.skillsDir, repoId);
-    await fs.remove(localPath);
+    return newRepo;
   }
-
-  async checkForUpdates(repoId: string): Promise<UpdateCheckResult> {
-    const localPath = path.join(this.skillsDir, repoId);
-    try {
-      const git = simpleGit(localPath);
-      await git.fetch();
-      const status = await git.status();
-      return {
-        repoId,
-        hasUpdates: status.behind > 0,
-        behindCount: status.behind,
-        aheadCount: status.ahead
-      };
-    } catch (err) {
-      return {
-        repoId,
-        hasUpdates: false,
-        behindCount: 0,
-        aheadCount: 0,
-        error: (err as Error).message
-      };
-    }
-  }
-
-  async checkAllUpdates(repoIds: string[]): Promise<UpdateCheckResult[]> {
-    return Promise.all(repoIds.map(id => this.checkForUpdates(id)));
-  }
+  
+  // ... 其他方法需同步更新 Config
 }
 ```
 
