@@ -1,4 +1,3 @@
-
 import { ipcRenderer, contextBridge } from 'electron';
 import { IpcApi, IpcChannels } from '../shared/ipc-channels';
 

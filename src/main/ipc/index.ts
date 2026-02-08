@@ -1,12 +1,12 @@
 
 import { ipcMain, shell, dialog } from 'electron';
-import { IpcChannels } from '../../shared/ipc-channels';
-import { ConfigService } from '../services/config';
-import { PlatformService } from '../services/platform';
-import { GitService } from '../services/git';
-import { SymlinkService } from '../services/symlink';
-import { RuleService } from '../services/rule';
-import { RuleDeployService } from '../services/rule-deploy';
+import { IpcChannels } from '../../shared/ipc-channels.js';
+import { ConfigService } from '../services/config.js';
+import { PlatformService } from '../services/platform.js';
+import { GitService } from '../services/git.js';
+import { SymlinkService } from '../services/symlink.js';
+import { RuleService } from '../services/rule.js';
+import { RuleDeployService } from '../services/rule-deploy.js';
 
 export function registerIpcHandlers(baseDir: string) {
   const configService = new ConfigService(baseDir);
