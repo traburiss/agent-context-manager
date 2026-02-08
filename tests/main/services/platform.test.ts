@@ -1,92 +1,112 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { PlatformService } from '@/main/services/platform';
-import fs from 'fs-extra';
-import path from 'path';
-import os from 'os';
-import { Platform } from '@/shared/types';
+import { Platform, UserConfig, SystemConfig } from '@/shared/types';
+import { ConfigService } from '@/main/services/config'; // Import type only effectively
+
+// Mock Electron just in case imports trigger it, though we don't expect to use it.
+vi.mock('electron', () => ({
+  app: {
+    getPath: () => '/tmp/mock-app-data'
+  }
+}));
 
 describe('PlatformService', () => {
-  let platformService: PlatformService;
-  let testDir: string;
+    let platformService: PlatformService;
+    let mockConfigService: any; // Using any to easily mock methods
+    let memoryAgents: Platform[] = [];
 
-  beforeEach(async () => {
-    testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'agent-context-manager-platform-test-'));
-    platformService = new PlatformService(testDir);
-  });
+    beforeEach(() => {
+        memoryAgents = [];
+        
+        // Manual mock of ConfigService
+        mockConfigService = {
+            getUserConfig: vi.fn().mockImplementation(async () => {
+                return { 
+                    agents: memoryAgents,
+                    skills: [],
+                    rules: []
+                } as UserConfig;
+            }),
+            setUserConfig: vi.fn().mockImplementation(async (patch: Partial<UserConfig>) => {
+                if (patch.agents) {
+                    memoryAgents = patch.agents;
+                }
+            }),
+            resolveVariables: vi.fn().mockImplementation((val: string) => {
+                return val.replace('${HOME}', '/mock/home');
+            }),
+            getPresets: vi.fn().mockResolvedValue([
+                { name: 'MockPreset', skillsDir: '${HOME}/skills', rulesFile: '${HOME}/rules.md' }
+            ])
+        };
 
-  afterEach(async () => {
-    await fs.remove(testDir);
-  });
-
-  it('should create and list platforms', async () => {
-    const platformData: Omit<Platform, 'id'> = {
-      name: 'Test Platform',
-      skillsDir: '${HOME}/skills',
-      rulesFile: '${HOME}/rules.md',
-      enabled: true,
-      linkedSkills: [],
-      linkedRules: []
-    };
-
-    const created = await platformService.create(platformData);
-    expect(created.id).toBe('test-platform');
-    expect(created.name).toBe('Test Platform');
-
-    const list = await platformService.list();
-    expect(list).toHaveLength(1);
-    expect(list[0].id).toBe('test-platform');
-    // List should return resolved paths
-    expect(list[0].skillsDir).not.toContain('${HOME}');
-  });
-
-  it('should get platform by id with resolved paths', async () => {
-    const platformData: Omit<Platform, 'id'> = {
-      name: 'My Agent',
-      skillsDir: '${HOME}/skills',
-      rulesFile: '${HOME}/rules.md',
-      enabled: true,
-      linkedSkills: [],
-      linkedRules: []
-    };
-
-    const created = await platformService.create(platformData);
-    const fetched = await platformService.get(created.id);
-    
-    expect(fetched).not.toBeNull();
-    expect(fetched?.name).toBe('My Agent');
-    expect(fetched?.skillsDir).not.toContain('${HOME}');
-  });
-
-  it('should update platform', async () => {
-    const created = await platformService.create({
-      name: 'Update Me',
-      skillsDir: '/tmp/1',
-      rulesFile: '/tmp/1.md',
-      enabled: true,
-      linkedSkills: [],
-      linkedRules: []
+        // Inject mock
+        platformService = new PlatformService(mockConfigService as ConfigService);
     });
 
-    const updated = { ...created, enabled: false, name: 'Updated' };
-    await platformService.update(updated);
-
-    const fetched = await platformService.get(created.id);
-    expect(fetched?.enabled).toBe(false);
-    expect(fetched?.name).toBe('Updated');
-  });
-
-  it('should delete platform', async () => {
-    const created = await platformService.create({
-      name: 'Delete Me',
-      skillsDir: '/tmp/1',
-      rulesFile: '/tmp/1.md',
-      enabled: true,
-      linkedSkills: [],
-      linkedRules: []
+    it('should list empty platforms initially', async () => {
+        const platforms = await platformService.list();
+        expect(platforms).toEqual([]);
     });
 
-    await platformService.delete(created.id);
-    const fetched = await platformService.get(created.id);
-    expect(fetched).toBeNull();
-  });
+    it('should create a platform and retrieve it', async () => {
+        const newPlatform = {
+            name: 'Test Agent',
+            skillsDir: '${HOME}/test/skills',
+            rulesFile: '${HOME}/test/rules.md',
+            enabled: true,
+             linkedSkills: [],
+             linkedRules: []
+        };
+
+        const created = await platformService.create(newPlatform);
+        
+        expect(created.id).toBe('test-agent');
+        expect(created.skillsDir).toBe('/mock/home/test/skills'); // Should be resolved
+        
+        const list = await platformService.list();
+        expect(list).toHaveLength(1);
+        expect(list[0].id).toBe('test-agent');
+        
+        // Verify setUserConfig was called with raw paths (not checking here but logic implies it)
+    });
+
+    it('should update a platform', async () => {
+        const p = await platformService.create({
+            name: 'Update Test',
+            skillsDir: 'dir1',
+            rulesFile: 'file1',
+            enabled: true
+        });
+
+        const updated = await platformService.update({
+            ...p,
+            name: 'Updated Name'
+        });
+
+        expect(updated.name).toBe('Updated Name');
+        
+        const check = await platformService.get(p.id);
+        expect(check?.name).toBe('Updated Name');
+    });
+
+    it('should delete a platform', async () => {
+        const p = await platformService.create({
+            name: 'Delete Test',
+            skillsDir: 'dir1',
+            rulesFile: 'file1',
+            enabled: true
+        });
+
+        await platformService.delete(p.id);
+        
+        const list = await platformService.list();
+        expect(list).toHaveLength(0);
+    });
+
+    it('should get presets', async () => {
+        const presets = await platformService.getPresets();
+        expect(presets).toHaveLength(1);
+        expect(presets[0].name).toBe('MockPreset');
+    });
 });

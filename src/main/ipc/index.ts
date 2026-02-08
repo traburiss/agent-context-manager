@@ -7,15 +7,16 @@ import { GitService } from '../services/git.js';
 import { SymlinkService } from '../services/symlink.js';
 import { RuleService } from '../services/rule.js';
 import { RuleDeployService } from '../services/rule-deploy.js';
+import { SkillService } from '../services/skill.js';
 
 export function registerIpcHandlers(appDataPath: string) {
   const configService = new ConfigService(appDataPath);
-  // Legacy support: assume appDataPath is used as baseDir for other services until refactor
-  const platformService = new PlatformService(appDataPath);
-  const gitService = new GitService();
+  const platformService = new PlatformService(configService);
+  const gitService = new GitService(configService);
   const symlinkService = new SymlinkService();
-  const ruleService = new RuleService(appDataPath);
+  const ruleService = new RuleService(configService);
   const ruleDeployService = new RuleDeployService(platformService, ruleService);
+  const skillService = new SkillService(configService);
 
   // Helper to register handler with error handling
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,9 +49,13 @@ export function registerIpcHandlers(appDataPath: string) {
   // Git
   handle(IpcChannels.CheckGitInstalled, () => gitService.checkGitInstalled());
   handle(IpcChannels.CloneRepo, (url, targetDir) => gitService.clone(url, targetDir));
-  handle(IpcChannels.PullRepo, (targetDir) => gitService.pull(targetDir));
-  handle(IpcChannels.NormalizeUrl, async (url) => gitService.normalizeUrl(url)); // normalizeUrl is sync but IPC is async, acceptable
-  handle(IpcChannels.CheckUpdates, (targetDir) => gitService.checkUpdates(targetDir));
+  handle(IpcChannels.PullRepo, (repoId) => gitService.pull(repoId));
+  handle(IpcChannels.NormalizeUrl, async (url) => gitService.normalizeGitUrl(url)); 
+  handle(IpcChannels.CheckUpdates, (repoId) => gitService.checkUpdates(repoId));
+  handle(IpcChannels.DeleteRepo, (repoId) => gitService.delete(repoId));
+
+  // Skill
+  handle(IpcChannels.ListSkills, () => skillService.listAll());
 
   // Symlink
   handle(IpcChannels.CreateSymlink, (target, path) => symlinkService.createSymlink(target, path));
@@ -60,14 +65,15 @@ export function registerIpcHandlers(appDataPath: string) {
   // Rule
   handle(IpcChannels.ListRules, () => ruleService.list());
   handle(IpcChannels.GetRule, (id) => ruleService.get(id));
-  handle(IpcChannels.CreateRule, (rule) => ruleService.create(rule));
+  handle(IpcChannels.CreateRule, (rule, content) => ruleService.create(rule, content));
   handle(IpcChannels.UpdateRule, (rule) => ruleService.update(rule));
   handle(IpcChannels.DeleteRule, (id) => ruleService.delete(id));
   handle(IpcChannels.GetRuleContent, (id) => ruleService.getContent(id));
   handle(IpcChannels.SetRuleContent, (id, content) => ruleService.setContent(id, content));
 
   // Rule Deploy
-  handle(IpcChannels.DeployRules, (platformId) => ruleDeployService.deploy(platformId));
+  handle(IpcChannels.DeployRules, (ruleId, platformId) => ruleDeployService.deploy(ruleId, platformId));
+  handle(IpcChannels.UndeployRules, (ruleId, platformId) => ruleDeployService.undeploy(ruleId, platformId));
 
   // App
   handle(IpcChannels.OpenExternal, async (url) => {

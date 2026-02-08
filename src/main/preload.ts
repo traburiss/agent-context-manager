@@ -20,9 +20,13 @@ const api: IpcApi = {
   // Git
   [IpcChannels.CheckGitInstalled]: () => ipcRenderer.invoke(IpcChannels.CheckGitInstalled),
   [IpcChannels.CloneRepo]: (url, targetDir) => ipcRenderer.invoke(IpcChannels.CloneRepo, url, targetDir),
-  [IpcChannels.PullRepo]: (targetDir) => ipcRenderer.invoke(IpcChannels.PullRepo, targetDir),
+  [IpcChannels.PullRepo]: (repoId) => ipcRenderer.invoke(IpcChannels.PullRepo, repoId),
   [IpcChannels.NormalizeUrl]: (url) => ipcRenderer.invoke(IpcChannels.NormalizeUrl, url),
-  [IpcChannels.CheckUpdates]: (targetDir) => ipcRenderer.invoke(IpcChannels.CheckUpdates, targetDir),
+  [IpcChannels.CheckUpdates]: (repoId) => ipcRenderer.invoke(IpcChannels.CheckUpdates, repoId),
+  [IpcChannels.DeleteRepo]: (repoId) => ipcRenderer.invoke(IpcChannels.DeleteRepo, repoId),
+
+  // Skill
+  [IpcChannels.ListSkills]: () => ipcRenderer.invoke(IpcChannels.ListSkills),
 
   // Symlink
   [IpcChannels.CreateSymlink]: (target, path) => ipcRenderer.invoke(IpcChannels.CreateSymlink, target, path),
@@ -32,14 +36,15 @@ const api: IpcApi = {
   // Rule
   [IpcChannels.ListRules]: () => ipcRenderer.invoke(IpcChannels.ListRules),
   [IpcChannels.GetRule]: (id) => ipcRenderer.invoke(IpcChannels.GetRule, id),
-  [IpcChannels.CreateRule]: (rule) => ipcRenderer.invoke(IpcChannels.CreateRule, rule),
+  [IpcChannels.CreateRule]: (rule, content) => ipcRenderer.invoke(IpcChannels.CreateRule, rule, content),
   [IpcChannels.UpdateRule]: (rule) => ipcRenderer.invoke(IpcChannels.UpdateRule, rule),
   [IpcChannels.DeleteRule]: (id) => ipcRenderer.invoke(IpcChannels.DeleteRule, id),
   [IpcChannels.GetRuleContent]: (id) => ipcRenderer.invoke(IpcChannels.GetRuleContent, id),
   [IpcChannels.SetRuleContent]: (id, content) => ipcRenderer.invoke(IpcChannels.SetRuleContent, id, content),
 
   // Rule Deploy
-  [IpcChannels.DeployRules]: (platformId) => ipcRenderer.invoke(IpcChannels.DeployRules, platformId),
+  [IpcChannels.DeployRules]: (ruleId, platformId) => ipcRenderer.invoke(IpcChannels.DeployRules, ruleId, platformId),
+  [IpcChannels.UndeployRules]: (ruleId, platformId) => ipcRenderer.invoke(IpcChannels.UndeployRules, ruleId, platformId),
 
   // App
   [IpcChannels.OpenExternal]: (url) => ipcRenderer.invoke(IpcChannels.OpenExternal, url),

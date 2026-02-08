@@ -30,7 +30,7 @@ export class SymlinkService {
     } catch (error) {
        // Check for admin rights error (heuristic)
        if ((error as any).code === 'EPERM') {
-           throw new Error('Permission denied. Administrator rights might be required to create symbolic links.');
+           throw new Error('Permission denied. Administrator rights might be required to create symbolic links.', { cause: error });
        }
        throw error;
     }

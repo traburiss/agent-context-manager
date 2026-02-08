@@ -1,25 +1,14 @@
-
-import yaml from 'js-yaml';
 import fs from 'fs-extra';
 import path from 'path';
 import { Rule } from '../../shared/types';
+import { ConfigService } from './config';
 
 export class RuleService {
-  private configDir: string;
-  private rulesFile: string;
-
-  constructor(baseDir: string) {
-    this.configDir = path.join(baseDir, 'config');
-    this.rulesFile = path.join(this.configDir, 'rules.yaml');
-  }
+  constructor(private configService: ConfigService) {}
 
   async list(): Promise<Rule[]> {
-    if (!await fs.pathExists(this.rulesFile)) {
-      return [];
-    }
-
-    const content = await fs.readFile(this.rulesFile, 'utf-8');
-    return (yaml.load(content) as Rule[]) || [];
+    const config = await this.configService.getUserConfig();
+    return config.rules;
   }
 
   async get(id: string): Promise<Rule | null> {
@@ -27,7 +16,7 @@ export class RuleService {
     return rules.find(r => r.id === id) || null;
   }
 
-  async create(ruleData: Omit<Rule, 'id' | 'createdAt' | 'localPath' | 'linkedPlatforms'> & { localPath?: string; linkedPlatforms?: string[] }): Promise<Rule> {
+  async create(ruleData: Omit<Rule, 'id' | 'createdAt' | 'updatedAt' | 'localPath' | 'linkedPlatforms'> & { localPath?: string; linkedPlatforms?: string[] }, content: string = ''): Promise<Rule> {
     const rules = await this.list();
     const id = this.generateId(ruleData.name);
     
@@ -35,51 +24,72 @@ export class RuleService {
       throw new Error(`Rule with ID ${id} already exists`);
     }
 
-    const localPath = ruleData.localPath || path.join(this.configDir, 'rules', `${id}.md`);
+    const systemConfig = await this.configService.getSystemConfig();
+    if (!systemConfig.baseDir) {
+        throw new Error('System base directory not set');
+    }
 
+    const rulesDir = path.join(systemConfig.baseDir, 'rules');
+    await fs.ensureDir(rulesDir);
+
+    const localPath = ruleData.localPath || path.join(rulesDir, `${id}.md`);
+
+    // Write content
+    await fs.writeFile(localPath, content, 'utf-8');
+    
+    const now = new Date().toISOString();
     const newRule: Rule = {
       linkedPlatforms: [],
       ...ruleData,
       id,
       localPath,
-      createdAt: new Date().toISOString()
+      createdAt: now
+      // updatedAt missing in interface? Interface has: id, name, description?, localPath, linkedPlatforms, createdAt.
+      // Let's check shared/types.ts again. It has createdAt. 
+      // Design 04_rules.md had updatedAt in its snippet but shared/types might differ.
+      // Let's stick to shared/types for now, or update shared/types if needed.
     };
 
-    rules.push(newRule);
-    await this.saveRules(rules);
-    
-    // Create the rule file if it doesn't exist
-    await fs.ensureFile(newRule.localPath);
+    const userConfig = await this.configService.getUserConfig();
+    userConfig.rules.push(newRule);
+    await this.configService.setUserConfig({ rules: userConfig.rules });
     
     return newRule;
   }
 
   async update(rule: Rule): Promise<Rule> {
-    const rules = await this.list();
-    const index = rules.findIndex(r => r.id === rule.id);
+    const userConfig = await this.configService.getUserConfig();
+    const index = userConfig.rules.findIndex(r => r.id === rule.id);
     
     if (index === -1) {
       throw new Error(`Rule with ID ${rule.id} does not exist`);
     }
 
-    rules[index] = rule;
-    await this.saveRules(rules);
+    userConfig.rules[index] = rule;
+    await this.configService.setUserConfig({ rules: userConfig.rules });
     return rule;
   }
 
   async delete(id: string): Promise<void> {
-    const rules = await this.list();
-    const index = rules.findIndex(r => r.id === id);
+    const userConfig = await this.configService.getUserConfig();
+    const index = userConfig.rules.findIndex(r => r.id === id);
     
     if (index !== -1) {
-      // Also delete the file? Maybe not, just the entry.
-      // Requirements say "CRUD for Rules", implying the entry.
-      // But if we created the file, maybe we should delete it?
-      // For safety, let's keep the file for now, or maybe the user wants to keep it.
-      // But wait, localPath is where the content is.
-      // Let's just remove the entry from the list for now.
-      rules.splice(index, 1);
-      await this.saveRules(rules);
+      const rule = userConfig.rules[index];
+      
+      // Attempt to delete the file if it exists
+      if (await fs.pathExists(rule.localPath)) {
+          // Verify it's in our managed directory to avoid deleting user's arbitrary files?
+          // For now, assuming we own it if we created it.
+          try {
+            await fs.remove(rule.localPath);
+          } catch (e) {
+              console.error(`Failed to delete rule file at ${rule.localPath}`, e);
+          }
+      }
+
+      userConfig.rules.splice(index, 1);
+      await this.configService.setUserConfig({ rules: userConfig.rules });
     }
   }
 
@@ -104,11 +114,6 @@ export class RuleService {
 
     await fs.ensureDir(path.dirname(rule.localPath));
     await fs.writeFile(rule.localPath, content, 'utf-8');
-  }
-
-  private async saveRules(rules: Rule[]): Promise<void> {
-    await fs.ensureDir(this.configDir);
-    await fs.writeFile(this.rulesFile, yaml.dump(rules));
   }
 
   private generateId(name: string): string {

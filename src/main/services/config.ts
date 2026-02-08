@@ -219,7 +219,7 @@ export class ConfigService {
     return [...builtInPresets, ...systemPresets];
   }
 
-  private resolveVariables(value: string): string {
+  public resolveVariables(value: string): string {
     const vars: Record<string, string> = {
       '${HOME}': process.env.HOME || process.env.USERPROFILE || '',
       '${APPDATA}': process.env.APPDATA || '',

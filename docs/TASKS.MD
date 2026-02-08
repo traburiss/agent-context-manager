@@ -8,7 +8,7 @@
 - [x] 配置 ESLint + Prettier
 - [x] 创建基础目录结构
 
-## Phase 2: 核心服务层 `[/]`
+## Phase 2: 核心服务层 ✅
 
 > [!NOTE]
 > 核心服务正在根据 [Design 05_config](docs/design/05_config.md) 的**分层存储方案**进行重构。
@@ -24,45 +24,45 @@
   - [x] `checkGitInstalled`
   - [x] `resolveVariables` (${HOME}, ${APPDATA} 等)
 
-### 2.2 AI Agent服务 (PlatformService) `[/]`
+### 2.2 AI Agent服务 (PlatformService) ✅
 
 > 参考: [Design 02_platform](docs/design/02_platform.md)
 
 - [x] 初始 `PlatformService` 实现 (Old)
-- [ ] **重构：适配 `ConfigService`**
-  - [ ] `list()`: 从 `ConfigService.getUserConfig().agents` 读取
-  - [ ] `create/update/delete`: 调用 `ConfigService.setUserConfig` 更新 `.agents` 数组
-  - [ ] 移除旧的文件系统 (`platforms/*.yaml`) 读取逻辑
-- [ ] **实现预设 (Presets) 逻辑**
-  - [ ] 加载内置 `resources/presets`
-  - [ ] 实现 `getPresets()` 方法
+- [x] **重构：适配 `ConfigService`**
+  - [x] `list()`: 从 `ConfigService.getUserConfig().agents` 读取
+  - [x] `create/update/delete`: 调用 `ConfigService.setUserConfig` 更新 `.agents` 数组
+  - [x] 移除旧的文件系统 (`platforms/*.yaml`) 读取逻辑
+- [x] **实现预设 (Presets) 逻辑**
+  - [x] 加载内置 `resources/presets`
+  - [x] 实现 `getPresets()` 方法 (Moved to ConfigService)
 
-### 2.3 Skills 服务 (SkillService & GitService) `[/]`
+### 2.3 Skills 服务 (SkillService & GitService) ✅
 
 > 参考: [Design 03_skills](docs/design/03_skills.md)
 
 - [x] 初始 `GitService` 实现 (Old)
-- [ ] **重构：SkillRepo 管理**
-  - [ ] `GitService`: 负责 clone/pull/check-update
-  - [ ] 仓库元数据存储于 `ConfigService.getUserConfig().skills`
-- [ ] **实现 Skill 扫描逻辑**
-  - [ ] 创建 `SkillService`
-  - [ ] 实现 `scanSkills(repoPath)`: 递归查找 `SKILL.MD`
-  - [ ] 解析 `SKILL.MD` 提取描述信息
+- [x] **重构：SkillRepo 管理**
+  - [x] `GitService`: 负责 clone/pull/check-update
+  - [x] 仓库元数据存储于 `ConfigService.getUserConfig().skills`
+- [x] **实现 Skill 扫描逻辑**
+  - [x] 创建 `SkillService`
+  - [x] 实现 `scanSkills(repoPath)`: 递归查找 `SKILL.MD`
+  - [x] 解析 `SKILL.MD` 提取描述信息
 
-### 2.4 Rules 服务 (RuleService) `[/]`
+### 2.4 Rules 服务 (RuleService) ✅
 
 > 参考: [Design 04_rules](docs/design/04_rules.md)
 
 - [x] 初始 `RuleService` 实现 (Old)
-- [ ] **重构：适配 `ConfigService`**
-  - [ ] `list()`: 从 `ConfigService.getUserConfig().rules` 读取
-  - [ ] `create/delete`: 更新配置中的 Rules 列表
-  - [ ] 保持 `.md` 文件存储在 `rules/` 目录下
-- [ ] **实现 Rule 部署逻辑 (RuleDeployService)**
-  - [ ] 实现标记生成 `<!-- SKILLS_MANAGER_RULE_START:id -->`
-  - [ ] 实现 `deploy`: 读取目标文件 -> 清理旧内容 -> 注入新内容 -> 保存
-  - [ ] 实现 `undeploy`: 清理标记内容
+- [x] **重构：适配 `ConfigService`**
+  - [x] `list()`: 从 `ConfigService.getUserConfig().rules` 读取
+  - [x] `create/delete`: 更新配置中的 Rules 列表
+  - [x] 保持 `.md` 文件存储在 `rules/` 目录下
+- [x] **实现 Rule 部署逻辑 (RuleDeployService)**
+  - [x] 实现标记生成 `<!-- SKILLS_MANAGER_RULE_START:id -->`
+  - [x] 实现 `deploy`: 读取目标文件 -> 清理旧内容 -> 注入新内容 -> 保存
+  - [x] 实现 `undeploy`: 清理标记内容
 
 ### 2.5 符号链接服务 (SymlinkService) ✅
 
@@ -70,17 +70,17 @@
 - [x] Windows junction 创建/删除
 - [x] 权限检测与提示
 
-## Phase 3: IPC 通信层 `[/]`
+## Phase 3: IPC 通信层 ✅
 
 - [x] 定义 IPC Channel 常量
-- [ ] **完善 Main 进程 IPC 处理器**
+- [x] **完善 Main 进程 IPC 处理器**
   - [x] Config IPC (`config:*`)
-  - [ ] Platform IPC (`platform:*`)
-  - [ ] Skills/Repo IPC (`repo:*`, `skill:*`)
-  - [ ] Rule IPC (`rule:*`)
-- [ ] **完善 Renderer 进程 IPC 客户端**
+  - [x] Platform IPC (`platform:*`)
+  - [x] Skills/Repo IPC (`repo:*`, `skill:*`)
+  - [x] Rule IPC (`rule:*`)
+- [x] **完善 Renderer 进程 IPC 客户端**
   - [x] `window.api` 类型定义
-  - [ ] 补全所有设计文档中定义的接口
+  - [x] 补全所有设计文档中定义的接口
 
 ## Phase 4: 前端界面 `[/]`
 
@@ -148,10 +148,10 @@
 ## Phase 6: 测试与文档
 
 - [ ] **单元测试**
-  - [ ] ConfigService (Done)
-  - [ ] PlatformService
-  - [ ] SkillService
-  - [ ] RuleService / RuleDeployService
+  - [x] ConfigService (Done)
+  - [x] PlatformService (Done)
+  - [x] SkillService (Done)
+  - [x] RuleService / RuleDeployService (Done)
 - [ ] **文档**
   - [ ] 用户手册 (README.md)
   - [ ] 开发贡献指南
@@ -161,8 +161,8 @@
 | 阶段 | 状态 | 交付物 |
 |------|------|--------|
 | Phase 1 | ✅ 完成 | 项目骨架 |
-| Phase 2 | 🚧 进行中 | 核心服务 (分离存储重构) |
-| Phase 3 | ⏳ 等待 | IPC 通信 |
+| Phase 2 | ✅ 完成 | 核心服务 (分离存储重构) |
+| Phase 3 | ✅ 完成 | IPC 通信 |
 | Phase 4 | ⏳ 等待 | 完整界面 |
 | Phase 5 | ⏳ 等待 | 自动构建 |
 | Phase 6 | ⏳ 等待 | 测试文档 |
