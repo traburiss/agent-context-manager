@@ -22,12 +22,19 @@
     "rules": "规则"
   },
   "startup": {
-    "title": "正在初始化 Agent 上下文管理器",
+    "title": "初始化 Agent Context Manager",
+    "subtitle": "您的本地 AI 环境",
     "envCheck": "环境检查",
-    "ready": "就绪",
-    "checking": "正在检查系统要求...",
-    "gitNotFound": "未找到 Git",
-    "gitNotFoundDesc": "请安装 Git 并重启应用程序。",
+    "configBaseDir": "配置存储目录",
+    "ready": "准备就绪",
+    "checking": "正在检查系统环境...",
+    "gitNotFound": "未检测到 Git",
+    "gitNotFoundDesc": "本应用需要 Git 来管理技能。请安装 Git 后重试。",
+    "selectBaseDirTitle": "选择存储目录",
+    "selectBaseDirDesc": "请选择一个文件夹用于存储您的配置、技能和规则。推荐选择一个空文件夹或专用的工作区。",
+    "selectBaseDirPlaceholder": "点击右侧按钮选择文件夹...",
+    "allReady": "一切准备就绪!",
+    "entering": "正在进入系统...",
     "initFailed": "初始化失败"
   },
   "agents": {

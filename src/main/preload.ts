@@ -3,8 +3,11 @@ import { IpcApi, IpcChannels } from '../shared/ipc-channels';
 
 const api: IpcApi = {
   // Config
-  [IpcChannels.GetGlobalConfig]: () => ipcRenderer.invoke(IpcChannels.GetGlobalConfig),
-  [IpcChannels.SetGlobalConfig]: (config) => ipcRenderer.invoke(IpcChannels.SetGlobalConfig, config),
+  // Config
+  [IpcChannels.GetSystemConfig]: () => ipcRenderer.invoke(IpcChannels.GetSystemConfig),
+  [IpcChannels.SetSystemConfig]: (config) => ipcRenderer.invoke(IpcChannels.SetSystemConfig, config),
+  [IpcChannels.GetUserConfig]: () => ipcRenderer.invoke(IpcChannels.GetUserConfig),
+  [IpcChannels.SetUserConfig]: (config) => ipcRenderer.invoke(IpcChannels.SetUserConfig, config),
   [IpcChannels.GetPresets]: () => ipcRenderer.invoke(IpcChannels.GetPresets),
 
   // Platform

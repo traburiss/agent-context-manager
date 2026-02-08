@@ -1,10 +1,12 @@
 
-import { GlobalConfig, Platform, PlatformPreset, Rule } from './types';
+import { SystemConfig, UserConfig, Platform, PlatformPreset, Rule } from './types';
 
 export enum IpcChannels {
   // Config
-  GetGlobalConfig = 'config:get-global',
-  SetGlobalConfig = 'config:set-global',
+  GetSystemConfig = 'config:get-system',
+  SetSystemConfig = 'config:set-system',
+  GetUserConfig = 'config:get-user',
+  SetUserConfig = 'config:set-user',
   GetPresets = 'config:get-presets',
 
   // Platform
@@ -47,8 +49,10 @@ export enum IpcChannels {
 // Request/Response Types
 export interface IpcApi {
   // Config
-  [IpcChannels.GetGlobalConfig]: () => Promise<GlobalConfig>;
-  [IpcChannels.SetGlobalConfig]: (config: Partial<GlobalConfig>) => Promise<void>;
+  [IpcChannels.GetSystemConfig]: () => Promise<SystemConfig>;
+  [IpcChannels.SetSystemConfig]: (config: Partial<SystemConfig>) => Promise<void>;
+  [IpcChannels.GetUserConfig]: () => Promise<UserConfig>;
+  [IpcChannels.SetUserConfig]: (config: Partial<UserConfig>) => Promise<void>;
   [IpcChannels.GetPresets]: () => Promise<PlatformPreset[]>;
 
   // Platform

@@ -8,12 +8,13 @@ import { SymlinkService } from '../services/symlink.js';
 import { RuleService } from '../services/rule.js';
 import { RuleDeployService } from '../services/rule-deploy.js';
 
-export function registerIpcHandlers(baseDir: string) {
-  const configService = new ConfigService(baseDir);
-  const platformService = new PlatformService(baseDir);
+export function registerIpcHandlers(appDataPath: string) {
+  const configService = new ConfigService(appDataPath);
+  // Legacy support: assume appDataPath is used as baseDir for other services until refactor
+  const platformService = new PlatformService(appDataPath);
   const gitService = new GitService();
   const symlinkService = new SymlinkService();
-  const ruleService = new RuleService(baseDir);
+  const ruleService = new RuleService(appDataPath);
   const ruleDeployService = new RuleDeployService(platformService, ruleService);
 
   // Helper to register handler with error handling
@@ -31,9 +32,11 @@ export function registerIpcHandlers(baseDir: string) {
   };
 
   // Config
-  handle(IpcChannels.GetGlobalConfig, () => configService.getGlobalConfig());
-  handle(IpcChannels.SetGlobalConfig, (config) => configService.setGlobalConfig(config));
-  handle(IpcChannels.GetPresets, () => configService.getPresets());
+  handle(IpcChannels.GetSystemConfig, async () => configService.getSystemConfig());
+  handle(IpcChannels.SetSystemConfig, async (config) => configService.setSystemConfig(config));
+  handle(IpcChannels.GetUserConfig, async () => configService.getUserConfig());
+  handle(IpcChannels.SetUserConfig, async (config) => configService.setUserConfig(config));
+  handle(IpcChannels.GetPresets, async () => configService.getPresets());
 
   // Platform
   handle(IpcChannels.ListPlatforms, () => platformService.list());

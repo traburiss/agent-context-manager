@@ -11,101 +11,158 @@
 ## Phase 2: 核心服务层 `[/]`
 
 > [!NOTE]
-> 当前核心服务已按初始设计实现，但需根据最新的**分层存储方案**（Split Storage）进行重构。
+> 核心服务正在根据 [Design 05_config](docs/design/05_config.md) 的**分层存储方案**进行重构。
 
-### 2.1 配置服务 `[/]`
+### 2.1 配置服务 (ConfigService) ✅
 
-- [x] 初始 `ConfigService` 实现 (Old)
-- [ ] **重构：实现分层配置逻辑 (Split Storage)**
-- [ ] 系统配置与用户配置分离读写
-- [ ] 异步去抖 (Debounce) 持久化
-- [ ] 配置文件头部注释注入
+- [x] **初始 ConfigService 实现**
+- [x] **重构：实现分层配置逻辑**
+  - [x] `SystemConfig` (App Data) 与 `UserConfig` (Base Dir) 分离
+  - [x] 异步去抖 (Debounce) 持久化
+  - [x] 配置文件头部注释注入
+- [x] **实现启动流程支持**
+  - [x] `checkGitInstalled`
+  - [x] `resolveVariables` (${HOME}, ${APPDATA} 等)
 
-### 2.2 AI Agent服务 `[/]`
+### 2.2 AI Agent服务 (PlatformService) `[/]`
+
+> 参考: [Design 02_platform](docs/design/02_platform.md)
 
 - [x] 初始 `PlatformService` 实现 (Old)
-- [ ] **重构：适配单文件 `ai-agent.yaml` 存储**
-- [ ] 移除旧的 `platforms/` 文件夹逻辑
+- [ ] **重构：适配 `ConfigService`**
+  - [ ] `list()`: 从 `ConfigService.getUserConfig().agents` 读取
+  - [ ] `create/update/delete`: 调用 `ConfigService.setUserConfig` 更新 `.agents` 数组
+  - [ ] 移除旧的文件系统 (`platforms/*.yaml`) 读取逻辑
+- [ ] **实现预设 (Presets) 逻辑**
+  - [ ] 加载内置 `resources/presets`
+  - [ ] 实现 `getPresets()` 方法
 
-### 2.3 Git 服务 `[/]`
+### 2.3 Skills 服务 (SkillService & GitService) `[/]`
+
+> 参考: [Design 03_skills](docs/design/03_skills.md)
 
 - [x] 初始 `GitService` 实现 (Old)
-- [ ] **重构：集成新的配置 Service 管理 Skills 元数据**
+- [ ] **重构：SkillRepo 管理**
+  - [ ] `GitService`: 负责 clone/pull/check-update
+  - [ ] 仓库元数据存储于 `ConfigService.getUserConfig().skills`
+- [ ] **实现 Skill 扫描逻辑**
+  - [ ] 创建 `SkillService`
+  - [ ] 实现 `scanSkills(repoPath)`: 递归查找 `SKILL.MD`
+  - [ ] 解析 `SKILL.MD` 提取描述信息
 
-### 2.4 符号链接服务 ✅
+### 2.4 Rules 服务 (RuleService) `[/]`
 
-- [x] 实现 `SymlinkService` 类
-- [x] Windows junction 创建
-- [x] 权限检测与提示
-
-### 2.5 Rules 服务 `[/]`
+> 参考: [Design 04_rules](docs/design/04_rules.md)
 
 - [x] 初始 `RuleService` 实现 (Old)
-- [ ] **重构：适配单文件 `rules.yaml` 元数据管理**
+- [ ] **重构：适配 `ConfigService`**
+  - [ ] `list()`: 从 `ConfigService.getUserConfig().rules` 读取
+  - [ ] `create/delete`: 更新配置中的 Rules 列表
+  - [ ] 保持 `.md` 文件存储在 `rules/` 目录下
+- [ ] **实现 Rule 部署逻辑 (RuleDeployService)**
+  - [ ] 实现标记生成 `<!-- SKILLS_MANAGER_RULE_START:id -->`
+  - [ ] 实现 `deploy`: 读取目标文件 -> 清理旧内容 -> 注入新内容 -> 保存
+  - [ ] 实现 `undeploy`: 清理标记内容
+
+### 2.5 符号链接服务 (SymlinkService) ✅
+
+- [x] 实现 `SymlinkService` 类
+- [x] Windows junction 创建/删除
+- [x] 权限检测与提示
 
 ## Phase 3: IPC 通信层 `[/]`
 
 - [x] 定义 IPC Channel 常量
-- [ ] **重构：更新 Main 进程 IPC 处理器以调用新版 Service**
-- [ ] 实现类型安全的 IPC 客户端 (Renderer)
+- [ ] **完善 Main 进程 IPC 处理器**
+  - [x] Config IPC (`config:*`)
+  - [ ] Platform IPC (`platform:*`)
+  - [ ] Skills/Repo IPC (`repo:*`, `skill:*`)
+  - [ ] Rule IPC (`rule:*`)
+- [ ] **完善 Renderer 进程 IPC 客户端**
+  - [x] `window.api` 类型定义
+  - [ ] 补全所有设计文档中定义的接口
 
-## Phase 4: 前端界面
+## Phase 4: 前端界面 `[/]`
 
-### 4.1 启动流程
+### 4.1 启动流程 ✅
 
-- [ ] 权限检测页面
-- [ ] Git 检测页面
-- [ ] 初始化向导
+> 参考: [Design 01_startup](docs/design/01_startup.md)
+
+- [x] Git 环境检测
+- [x] 初始化向导 (Base Dir 选择)
+- [x] 国际化 (i18n) 支持
 
 ### 4.2 主界面框架
 
-- [ ] Tab 导航组件
-- [ ] 全局状态管理 (Zustand)
+- [ ] **Layout 组件**
+  - [ ] 顶部导航栏 (Logo + Tabs)
+  - [ ] 底部状态栏 (版本信息)
+- [ ] **全局状态 (useStore)**
+  - [ ] 集成 Platform, Skills, Rules 状态
 
-### 4.3 AI Agent管理
+### 4.3 AI Agent管理 (Agents Tab)
 
-- [ ] AI Agent列表页
-- [ ] 添加AI Agent对话框
-- [ ] 预设选择器
+> 参考: [Design 02_platform](docs/design/02_platform.md)
 
-### 4.4 Skills 管理
+- [ ] **Agent 列表视图**
+  - [ ] 展示 Agent 卡片 (包含 Skills/Rules 路径状态)
+  - [ ] 绑定/解绑 Skills 概览
+- [ ] **新建 Agent 对话框**
+  - [ ] 预设选择器 (Tab: 预设 / 自定义)
+  - [ ] 表单验证
 
-- [ ] 仓库列表页
-- [ ] 添加仓库对话框
-- [ ] 仓库详情页
-- [ ] Skill 列表组件
-- [ ] AI Agent部署开关
+### 4.4 Skills 管理 (Skills Tab)
 
-### 4.5 Rules 管理
+> 参考: [Design 03_skills](docs/design/03_skills.md)
 
-- [ ] Rules 列表页
-- [ ] 新建 Rule 对话框
-- [ ] Rule 编辑页
-- [ ] Markdown 编辑器
-- [ ] AI Agent部署开关
+- [ ] **仓库列表视图**
+  - [ ] 展示已添加的 Skill Repos
+  - [ ] 状态指示器 (Up-to-date, Behind, Confirming)
+  - [ ] 操作按钮: 更新, 删除, 详情
+- [ ] **添加仓库对话框**
+  - [ ] 输入 URL / 选择本地路径
+- [ ] **Skill 详情/部署页**
+  - [ ] 展示仓库内扫描到的 Skills
+  - [ ] 部署矩阵: Skill x Agent (Checkbox)
+  - [ ] 触发 `skill:link` / `skill:unlink`
+
+### 4.5 Rules 管理 (Rules Tab)
+
+> 参考: [Design 04_rules](docs/design/04_rules.md)
+
+- [ ] **Rules 列表视图**
+  - [ ] 展示 Rule 文件列表
+  - [ ] 部署状态概览
+- [ ] **Rule 编辑器**
+  - [ ] Markdown 编辑预览
+  - [ ] 部署配置 (选择生效的 Agents)
 
 ## Phase 5: CI/CD
 
-- [ ] 创建 GitHub Actions 工作流
-- [ ] 配置 electron-builder
-- [ ] Windows 签名配置
-- [ ] 自动发布 Release
+> 参考: [Design 06_cicd](docs/design/06_cicd.md)
+
+- [ ] GitHub Actions 工作流配置
+- [ ] electron-builder 配置 (Win/Mac/Linux)
+- [ ] Release 自动发布
 
 ## Phase 6: 测试与文档
 
-- [ ] 单元测试 (Vitest)
-- [ ] E2E 测试 (Playwright)
-- [ ] 完善 README.md
-- [ ] 用户使用文档
+- [ ] **单元测试**
+  - [ ] ConfigService (Done)
+  - [ ] PlatformService
+  - [ ] SkillService
+  - [ ] RuleService / RuleDeployService
+- [ ] **文档**
+  - [ ] 用户手册 (README.md)
+  - [ ] 开发贡献指南
 
 ## 里程碑
 
-| 阶段 | 预计工期 | 交付物 |
-|------|---------|--------|
-| Phase 1 | 1 天 | 项目骨架 |
-| Phase 2 | 3 天 | 核心服务 |
-| Phase 3 | 1 天 | IPC 通信 |
-| Phase 4 | 5 天 | 完整界面 |
-| Phase 5 | 1 天 | 自动构建 |
-| Phase 6 | 2 天 | 测试文档 |
-| **总计** | **~13 天** | 可发布版本 |
+| 阶段 | 状态 | 交付物 |
+|------|------|--------|
+| Phase 1 | ✅ 完成 | 项目骨架 |
+| Phase 2 | 🚧 进行中 | 核心服务 (分离存储重构) |
+| Phase 3 | ⏳ 等待 | IPC 通信 |
+| Phase 4 | ⏳ 等待 | 完整界面 |
+| Phase 5 | ⏳ 等待 | 自动构建 |
+| Phase 6 | ⏳ 等待 | 测试文档 |

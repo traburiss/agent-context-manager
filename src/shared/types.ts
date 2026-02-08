@@ -45,6 +45,24 @@ export interface UpdateCheckResult {
   error?: string;
 }
 
+
+export interface SystemConfig {
+  baseDir: string;
+  language?: 'zh-CN' | 'en-US';
+  theme?: 'light' | 'dark' | 'system';
+  presets?: PlatformPreset[];
+  version: number;
+}
+
+export interface UserConfig {
+  agents: PlatformConfig[]; // from ai-agent.yaml
+  skills: SkillRepo[];     // from skills.yaml
+  rules: Rule[];           // from rules.yaml
+}
+
+/**
+ * @deprecated Use SystemConfig instead
+ */
 export interface GlobalConfig {
   version: number;
   gitPath?: string;
@@ -54,6 +72,7 @@ export interface GlobalConfig {
 }
 
 export interface PlatformConfig {
+  id: string;
   name: string;
   skillsDir: string;
   rulesFile: string;

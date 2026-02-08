@@ -1,9 +1,10 @@
-
 import { create } from 'zustand';
-import { GlobalConfig, Platform, PlatformPreset, Rule } from '../../shared/types';
+import { SystemConfig, UserConfig, Platform, PlatformPreset, Rule } from '../../shared/types';
+import { IpcChannels } from '../../shared/ipc-channels';
 
 interface AppState {
-  config: GlobalConfig | null;
+  systemConfig: SystemConfig | null;
+  userConfig: UserConfig | null;
   platforms: Platform[];
   rules: Rule[];
   presets: PlatformPreset[];
@@ -13,22 +14,29 @@ interface AppState {
 
   // Actions
   initializeApp: () => Promise<void>;
-  fetchConfig: () => Promise<void>;
-  updateConfig: (config: Partial<GlobalConfig>) => Promise<void>;
   
+  // System Config
+  fetchSystemConfig: () => Promise<void>;
+  updateSystemConfig: (config: Partial<SystemConfig>) => Promise<void>;
+  
+  // User Config
+  fetchUserConfig: () => Promise<void>;
+  updateUserConfig: (config: Partial<UserConfig>) => Promise<void>;
+
+  // Platform
   fetchPlatforms: () => Promise<void>;
   createPlatform: (platform: Omit<Platform, 'id'>) => Promise<void>;
   updatePlatform: (platform: Platform) => Promise<void>;
   deletePlatform: (id: string) => Promise<void>;
 
+  // Rules
   fetchRules: () => Promise<void>;
-  // Rule actions can be added as needed
-
   checkGit: () => Promise<void>;
 }
 
 export const useStore = create<AppState>((set, get) => ({
-  config: null,
+  systemConfig: null,
+  userConfig: null,
   platforms: [],
   rules: [],
   presets: [],
@@ -39,15 +47,21 @@ export const useStore = create<AppState>((set, get) => ({
   initializeApp: async () => {
     set({ isLoading: true, error: null });
     try {
+      await get().checkGit();
+      await get().fetchSystemConfig();
+      // Only fetch user config if baseDir is set, handled by fetchUserConfig or by system config load?
+      // Better to fetch explicitly.
+      const systemConfig = get().systemConfig;
+      if (systemConfig?.baseDir) {
+        await get().fetchUserConfig();
+      }
+
       await Promise.all([
-        get().checkGit(),
-        get().fetchConfig(),
-        get().fetchPlatforms(),
+        get().fetchPlatforms(), // PlatformService currently uses reading from disk, need to update PlatformService later.
         get().fetchRules()
       ]);
       
-      // Load presets
-      const presets = await window.api['config:get-presets']();
+      const presets = await window.api[IpcChannels.GetPresets]();
       set({ presets });
 
     } catch (error) {
@@ -57,19 +71,46 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
 
-  fetchConfig: async () => {
+  fetchSystemConfig: async () => {
     try {
-      const config = await window.api['config:get-global']();
-      set({ config });
+      const config = await window.api[IpcChannels.GetSystemConfig]();
+      set({ systemConfig: config });
     } catch (error) {
-      console.error('Failed to fetch config', error);
+      console.error('Failed to fetch system config', error);
     }
   },
 
-  updateConfig: async (config) => {
+  updateSystemConfig: async (config) => {
     try {
-      await window.api['config:set-global'](config);
-      await get().fetchConfig();
+      await window.api[IpcChannels.SetSystemConfig](config);
+      await get().fetchSystemConfig();
+      // If baseDir changed, we should re-fetch user config
+      if (config.baseDir) {
+        await get().fetchUserConfig();
+        // Also need to refresh platforms/rules as they depend on baseDir
+        await Promise.all([
+           get().fetchPlatforms(),
+           get().fetchRules()
+        ]);
+      }
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
+
+  fetchUserConfig: async () => {
+    try {
+      const config = await window.api[IpcChannels.GetUserConfig]();
+      set({ userConfig: config });
+    } catch (error) {
+      console.error('Failed to fetch user config', error);
+    }
+  },
+
+  updateUserConfig: async (config) => {
+    try {
+      await window.api[IpcChannels.SetUserConfig](config);
+      await get().fetchUserConfig();
     } catch (error) {
       set({ error: (error as Error).message });
     }
@@ -77,7 +118,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   fetchPlatforms: async () => {
     try {
-      const platforms = await window.api['platform:list']();
+      const platforms = await window.api[IpcChannels.ListPlatforms]();
       set({ platforms });
     } catch (error) {
       console.error('Failed to fetch platforms', error);
@@ -86,7 +127,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   createPlatform: async (platformData) => {
     try {
-      await window.api['platform:create'](platformData);
+      await window.api[IpcChannels.CreatePlatform](platformData);
       await get().fetchPlatforms();
     } catch (error) {
        set({ error: (error as Error).message });
@@ -96,7 +137,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   updatePlatform: async (platform) => {
     try {
-      await window.api['platform:update'](platform);
+      await window.api[IpcChannels.UpdatePlatform](platform);
       await get().fetchPlatforms();
     } catch (error) {
       set({ error: (error as Error).message });
@@ -106,7 +147,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   deletePlatform: async (id) => {
     try {
-      await window.api['platform:delete'](id);
+      await window.api[IpcChannels.DeletePlatform](id);
       await get().fetchPlatforms();
     } catch (error) {
       set({ error: (error as Error).message });
@@ -115,7 +156,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   fetchRules: async () => {
     try {
-      const rules = await window.api['rule:list']();
+      const rules = await window.api[IpcChannels.ListRules]();
       set({ rules });
     } catch (error) {
       console.error('Failed to fetch rules', error);
@@ -124,7 +165,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   checkGit: async () => {
     try {
-      const installed = await window.api['git:check-installed']();
+      const installed = await window.api[IpcChannels.CheckGitInstalled]();
       set({ gitInstalled: installed });
     } catch (error) {
       console.error('Failed to check git', error);

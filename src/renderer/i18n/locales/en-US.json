@@ -22,12 +22,19 @@
     "rules": "Rules"
   },
   "startup": {
-    "title": "Initializing Agent Context Manager",
+    "title": "Initialize Agent Context Manager",
+    "subtitle": "Your Local AI Environment",
     "envCheck": "Environment Check",
+    "configBaseDir": "Config Storage Directory",
     "ready": "Ready",
     "checking": "Checking system requirements...",
     "gitNotFound": "Git Not Found",
-    "gitNotFoundDesc": "Please install Git and restart the application.",
+    "gitNotFoundDesc": "This application requires Git to manage skills. Please install Git and retry.",
+    "selectBaseDirTitle": "Select Storage Directory",
+    "selectBaseDirDesc": "Please select a folder to store your configurations, skills, and rules. An empty folder or dedicated workspace is recommended.",
+    "selectBaseDirPlaceholder": "Click button to select folder...",
+    "allReady": "All Ready!",
+    "entering": "Entering system...",
     "initFailed": "Initialization Failed"
   },
   "agents": {
