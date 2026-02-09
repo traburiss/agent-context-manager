@@ -132,16 +132,16 @@
 
 > 参考: [Design 03_skills](docs/design/03_skills.md)
 
-- [ ] **仓库列表视图**
-  - [ ] 展示已添加的 Skill Repos
-  - [ ] 状态指示器 (Up-to-date, Behind, Confirming)
-  - [ ] 操作按钮: 更新, 删除, 详情
-- [ ] **添加仓库对话框**
-  - [ ] 输入 URL / 选择本地路径
-- [ ] **Skill 详情/部署页**
-  - [ ] 展示仓库内扫描到的 Skills
-  - [ ] 部署矩阵: Skill x Agent (Checkbox)
-  - [ ] 触发 `skill:link` / `skill:unlink`
+- [x] **仓库列表视图**
+  - [x] 展示已添加的 Skill Repos
+  - [x] 状态指示器 (Up-to-date, Behind, Confirming)
+  - [x] 操作按钮: 更新, 删除, 详情
+- [x] **添加仓库对话框**
+  - [x] 输入 URL / 选择本地路径
+- [x] **Skill 详情/部署页**
+  - [x] 展示仓库内扫描到的 Skills
+  - [x] 部署矩阵: Skill x Agent (Checkbox)
+  - [x] 触发 `skill:link` / `skill:unlink`
 
 ### 4.5 Rules 管理 (Rules Tab)
 

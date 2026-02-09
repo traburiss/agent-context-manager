@@ -16,7 +16,7 @@ export function registerIpcHandlers(appDataPath: string) {
   const symlinkService = new SymlinkService();
   const ruleService = new RuleService(configService);
   const ruleDeployService = new RuleDeployService(platformService, ruleService);
-  const skillService = new SkillService(configService);
+  const skillService = new SkillService(configService, platformService, symlinkService);
 
   // Helper to register handler with error handling
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,6 +58,8 @@ export function registerIpcHandlers(appDataPath: string) {
 
   // Skill
   handle(IpcChannels.ListSkills, () => skillService.listAll());
+  handle(IpcChannels.LinkSkill, (skillId, platformId) => skillService.link(skillId, platformId));
+  handle(IpcChannels.UnlinkSkill, (skillId, platformId) => skillService.unlink(skillId, platformId));
 
   // Symlink
   handle(IpcChannels.CreateSymlink, (target, path) => symlinkService.createSymlink(target, path));

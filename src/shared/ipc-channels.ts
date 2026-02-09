@@ -27,7 +27,9 @@ export enum IpcChannels {
   DeleteRepo = 'git:delete', // Added
 
   // Skill
-  ListSkills = 'skill:list', // Added
+  ListSkills = 'skill:list',
+  LinkSkill = 'skill:link',
+  UnlinkSkill = 'skill:unlink',
 
   // Symlink
   CreateSymlink = 'symlink:create',
@@ -81,7 +83,9 @@ export interface IpcApi {
   [IpcChannels.DeleteRepo]: (repoId: string) => Promise<void>; // Added
 
   // Skill
-  [IpcChannels.ListSkills]: () => Promise<Skill[]>; // Added
+  [IpcChannels.ListSkills]: () => Promise<Skill[]>;
+  [IpcChannels.LinkSkill]: (skillId: string, platformId: string) => Promise<void>;
+  [IpcChannels.UnlinkSkill]: (skillId: string, platformId: string) => Promise<void>;
 
   // Symlink
   [IpcChannels.CreateSymlink]: (target: string, path: string) => Promise<void>;
@@ -98,12 +102,16 @@ export interface IpcApi {
   [IpcChannels.SetRuleContent]: (id: string, content: string) => Promise<void>;
 
   // Rule Deploy
-  [IpcChannels.DeployRules]: (ruleId: string, platformId: string) => Promise<void>; // Updated args
-  [IpcChannels.UndeployRules]: (ruleId: string, platformId: string) => Promise<void>; // Added
+  [IpcChannels.DeployRules]: (ruleId: string, platformId: string) => Promise<void>;
+  [IpcChannels.UndeployRules]: (ruleId: string, platformId: string) => Promise<void>;
   
   // App
   [IpcChannels.OpenExternal]: (url: string) => Promise<void>;
   [IpcChannels.SelectDirectory]: () => Promise<string | null>;
-  [IpcChannels.SelectFile]: (filterName?: string, extensions?: string[]) => Promise<string | null>;
-  [IpcChannels.GetAppVersion]: () => Promise<string>; // Added
+  [IpcChannels.SelectFile]: (filterName: string, extensions: string[]) => Promise<string | null>;
+  [IpcChannels.GetAppVersion]: () => Promise<string>;
+
+  // Events
+  on: (channel: string, callback: (...args: any[]) => void) => () => void;
+  off: (channel: string, callback: (...args: any[]) => void) => void;
 }

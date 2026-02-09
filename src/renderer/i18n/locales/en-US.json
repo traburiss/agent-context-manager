@@ -14,7 +14,8 @@
     "select": "Select",
     "success": "Success",
     "error": "Error",
-    "warning": "Warning"
+    "warning": "Warning",
+    "actions": "Actions"
   },
   "nav": {
     "agents": "AI AGENT",
@@ -88,7 +89,23 @@
     "repoExists": "Repository already exists",
     "addSuccess": "Repository added",
     "addFailed": "Failed to add repository",
-    "removeSuccess": "Repository removed"
+    "removeSuccess": "Repository removed",
+    "removeFailed": "Failed to remove repository",
+    "status": "Status",
+    "repository": "Repository",
+    "checkUpdate": "Check Update",
+    "updateChecked": "Checked for updates",
+    "updateCheckFailed": "Failed to check updates",
+    "repoUrlRequired": "Please enter Git URL",
+    "readyToClone": "Ready to clone...",
+    "selectRepoToView": "Select a repository to view skills",
+    "skillLinked": "Skill linked",
+    "skillUnlinked": "Skill unlinked",
+    "linkFailed": "Failed to update skill link",
+    "skillName": "Skill Name",
+    "skillsInRepo": "Skills in {{repo}}",
+    "skillsFound": "{{count}} skills found",
+    "repositories": "Repositories"
   },
   "rules": {
     "title": "Rules",

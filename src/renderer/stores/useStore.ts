@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { SystemConfig, UserConfig, Platform, PlatformPreset, Rule, Skill } from '../../shared/types';
+import { SystemConfig, UserConfig, Platform, PlatformPreset, Rule, Skill, SkillRepo } from '../../shared/types';
 import { IpcChannels } from '../../shared/ipc-channels';
 
 interface AppState {
@@ -31,7 +31,12 @@ interface AppState {
   deletePlatform: (id: string) => Promise<void>;
 
   // Skills
-  fetchSkills: () => Promise<void>; // Added
+  fetchSkills: () => Promise<void>;
+  addRepo: (url: string, localPath?: string) => Promise<void>;
+  deleteRepo: (id: string) => Promise<void>;
+  checkRepoUpdate: (id: string) => Promise<void>;
+  linkSkill: (skillId: string, platformId: string) => Promise<void>;
+  unlinkSkill: (skillId: string, platformId: string) => Promise<void>;
 
   // Rules
   fetchRules: () => Promise<void>;
@@ -166,6 +171,84 @@ export const useStore = create<AppState>((set, get) => ({
         set({ skills });
     } catch (error) {
         console.error('Failed to fetch skills', error);
+    }
+  },
+
+  addRepo: async (url, localPath) => {
+    try {
+        set({ isLoading: true });
+        await window.api[IpcChannels.CloneRepo](url, localPath);
+        await get().fetchUserConfig(); // Refresh repos list
+        await get().fetchSkills();     // Refresh skills list
+    } catch (error) {
+        set({ error: (error as Error).message });
+        throw error;
+    } finally {
+        set({ isLoading: false });
+    }
+  },
+
+  deleteRepo: async (id) => {
+    try {
+        set({ isLoading: true });
+        await window.api[IpcChannels.DeleteRepo](id);
+        await get().fetchUserConfig();
+        await get().fetchSkills();
+    } catch (error) {
+        set({ error: (error as Error).message });
+    } finally {
+        set({ isLoading: false });
+    }
+  },
+
+  checkRepoUpdate: async (id) => {
+    try {
+        const result = await window.api[IpcChannels.CheckUpdates](id);
+        // Update the repo status in the store
+        // We might need to update the UserConfig or a separate status map
+        // For now, let's assume we refresh the config to get updated status if it was saved
+        // But CheckUpdates returns a result, we should probably store it.
+        // The current design suggests the repo object has 'updateStatus', let's stick to that if possible.
+        // However, CheckUpdates is usually on-demand.
+        // Let's just log it for now or assume the backend updates the config if needed?
+        // Actually, the backend GitService.checkUpdates doesn't seem to save to config automatically in previous designs.
+        // Let's assume we need to update the local state.
+        const userConfig = get().userConfig;
+        if (userConfig) {
+            const updatedRepos = userConfig.skills.map(repo => {
+                if (repo.id === id) {
+                    return {
+                        ...repo,
+                        updateStatus: result.hasUpdates ? 'behind' : 'up-to-date',
+                        behindCount: result.behindCount
+                    } as SkillRepo;
+                }
+                return repo;
+            });
+            set({ userConfig: { ...userConfig, skills: updatedRepos } });
+        }
+    } catch (error) {
+        console.error('Failed to check repo updates', error);
+    }
+  },
+
+  linkSkill: async (skillId, platformId) => {
+    try {
+        await window.api[IpcChannels.LinkSkill](skillId, platformId);
+        await get().fetchSkills(); // Refresh to update linked status
+        await get().fetchPlatforms(); // Refresh platforms to see linked skills
+    } catch (error) {
+        set({ error: (error as Error).message });
+    }
+  },
+
+  unlinkSkill: async (skillId, platformId) => {
+    try {
+        await window.api[IpcChannels.UnlinkSkill](skillId, platformId);
+        await get().fetchSkills();
+        await get().fetchPlatforms();
+    } catch (error) {
+        set({ error: (error as Error).message });
     }
   },
 

@@ -6,6 +6,8 @@ import { UserConfig, SystemConfig, SkillRepo } from '../../../src/shared/types';
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
+import { PlatformService } from '../../../src/main/services/platform';
+import { SymlinkService } from '../../../src/main/services/symlink';
 
 // Mock simple-git
 const mockGit = {
@@ -51,11 +53,27 @@ describe('Skill & Git Services', () => {
                 if (patch.skills) {
                     memorySkills = patch.skills;
                 }
-            })
+            }),
+            resolveVariables: vi.fn((p) => p)
+        };
+
+        const mockPlatformService = {
+            list: vi.fn().mockResolvedValue([]),
+            get: vi.fn(),
+            update: vi.fn()
+        };
+
+        const mockSymlinkService = {
+            createSymlink: vi.fn(),
+            removeSymlink: vi.fn()
         };
 
         gitService = new GitService(mockConfigService as ConfigService);
-        skillService = new SkillService();
+        skillService = new SkillService(
+            mockConfigService as ConfigService,
+            mockPlatformService as unknown as PlatformService,
+            mockSymlinkService as unknown as SymlinkService
+        );
     });
 
     afterEach(async () => {

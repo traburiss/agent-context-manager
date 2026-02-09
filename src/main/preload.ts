@@ -10,9 +10,19 @@ const api: IpcApi = {
   [IpcChannels.SetUserConfig]: (config) => ipcRenderer.invoke(IpcChannels.SetUserConfig, config),
   [IpcChannels.GetPresets]: () => ipcRenderer.invoke(IpcChannels.GetPresets),
 
+
+  // Events
+  on: (channel: string, callback: (...args: any[]) => void) => {
+    const subscription = (_event: any, ...args: any[]) => callback(...args);
+    ipcRenderer.on(channel, subscription);
+    return () => ipcRenderer.removeListener(channel, subscription);
+  },
+  off: (channel: string, callback: (...args: any[]) => void) => ipcRenderer.removeListener(channel, callback),
+
+  // Platform
   // Platform
   [IpcChannels.ListPlatforms]: () => ipcRenderer.invoke(IpcChannels.ListPlatforms),
-  [IpcChannels.GetPlatform]: (id) => ipcRenderer.invoke(IpcChannels.GetPlatform, id),
+  [IpcChannels.GetPlatform]: (id: string) => ipcRenderer.invoke(IpcChannels.GetPlatform, id),
   [IpcChannels.CreatePlatform]: (platform) => ipcRenderer.invoke(IpcChannels.CreatePlatform, platform),
   [IpcChannels.UpdatePlatform]: (platform) => ipcRenderer.invoke(IpcChannels.UpdatePlatform, platform),
   [IpcChannels.DeletePlatform]: (id) => ipcRenderer.invoke(IpcChannels.DeletePlatform, id),
@@ -29,6 +39,8 @@ const api: IpcApi = {
 
   // Skill
   [IpcChannels.ListSkills]: () => ipcRenderer.invoke(IpcChannels.ListSkills),
+  [IpcChannels.LinkSkill]: (skillId, platformId) => ipcRenderer.invoke(IpcChannels.LinkSkill, skillId, platformId),
+  [IpcChannels.UnlinkSkill]: (skillId, platformId) => ipcRenderer.invoke(IpcChannels.UnlinkSkill, skillId, platformId),
 
   // Symlink
   [IpcChannels.CreateSymlink]: (target, path) => ipcRenderer.invoke(IpcChannels.CreateSymlink, target, path),

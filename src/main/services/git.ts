@@ -90,13 +90,35 @@ export class GitService {
     }
 
     private extractRepoName(url: string): string {
-        // Extract the last part of the URL, remove .git if present
-        const parts = url.split('/');
-        let name = parts[parts.length - 1];
-        if (name.endsWith('.git')) {
-            name = name.slice(0, -4);
+        // Extract owner/repo from URL
+        // Supported formats:
+        // https://github.com/owner/repo.git
+        // git@github.com:owner/repo.git
+        
+        let path = url;
+        if (url.startsWith('https://')) {
+            path = url.replace('https://', '');
+        } else if (url.startsWith('git@')) {
+            path = url.replace('git@', '').replace(':', '/');
+        } else if (url.startsWith('ssh://')) {
+             path = url.replace('ssh://', '');
         }
-        return name;
+
+        // Remove .git
+        if (path.endsWith('.git')) {
+            path = path.slice(0, -4);
+        }
+
+        // Split by / and get last two parts
+        const parts = path.split('/');
+        if (parts.length >= 2) {
+            const owner = parts[parts.length - 2];
+            const repo = parts[parts.length - 1];
+            return `${owner}_${repo}`; // Use underscore to match folder naming convention preference or just keeping it flat
+        }
+
+        // Fallback
+        return parts[parts.length - 1];
     }
 
     async clone(url: string, _targetDir?: string): Promise<SkillRepo> { // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -124,7 +146,29 @@ export class GitService {
         }
 
         const git = await this.getGit();
-        await git.clone(normalizedUrl, localPath);
+        
+        // Log handler
+        git.outputHandler((command, stdout, stderr) => {
+            stdout.on('data', (data) => {
+                const message = data.toString();
+                 // Send to all windows
+                 import('electron').then(({ BrowserWindow }) => {
+                    BrowserWindow.getAllWindows().forEach(win => {
+                        win.webContents.send('git:log', message);
+                    });
+                 });
+            });
+            stderr.on('data', (data) => {
+                const message = data.toString();
+                 import('electron').then(({ BrowserWindow }) => {
+                    BrowserWindow.getAllWindows().forEach(win => {
+                        win.webContents.send('git:log', message);
+                    });
+                 });
+            });
+        });
+
+        await git.clone(normalizedUrl, localPath, ['--depth', '1', '--progress', '--verbose']);
 
         const newRepo: SkillRepo = {
             id: repoName,

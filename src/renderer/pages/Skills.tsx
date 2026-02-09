@@ -1,84 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../stores/useStore';
-import { 
-    List, Button, Modal, Form, Input, 
-    Message, Typography, Empty, Popconfirm 
-} from '@arco-design/web-react';
-import { 
-    IconPlus, IconDelete, IconBranch, 
-    IconLaunch 
-} from '@arco-design/web-react/icon';
+import { Button, Typography } from '@arco-design/web-react';
+import { IconPlus, IconSync } from '@arco-design/web-react/icon';
 import { useTranslation } from 'react-i18next';
-
-const FormItem = Form.Item;
+import { RepoList } from '../components/skills/RepoList';
+import { AddRepoModal } from '../components/skills/AddRepoModal';
+import { SkillList } from '../components/skills/SkillList';
 
 export default function Skills() {
-  const { userConfig, fetchUserConfig } = useStore();
+  const { fetchUserConfig, fetchPlatforms } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
-  const [isAdding, setIsAdding] = useState(false);
+  const [selectedRepoId, setSelectedRepoId] = useState<string | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
     fetchUserConfig();
-  }, [fetchUserConfig]);
-
-  const handleAddRepo = async () => {
-    try {
-        const values = await form.validate();
-        setIsAdding(true);
-
-        const normalized = await window.api['git:normalize-url'](values.url);
-        
-        const currentRepos = userConfig?.skills || [];
-        if (currentRepos.some(s => s.url === normalized || s.name === normalized)) {
-            Message.warning(t('skills.repoExists'));
-            return;
-        }
-
-        if (!userConfig) return;
-        
-        await window.api['git:clone'](normalized);
-        
-        await fetchUserConfig();
-        setIsModalOpen(false);
-        form.resetFields();
-        Message.success(t('skills.addSuccess'));
-    } catch (error) {
-        console.error(error);
-        Message.error(t('skills.addFailed'));
-    } finally {
-        setIsAdding(false);
-    }
-  };
-
-  const handleDelete = async (repoUrl: string) => {
-    try {
-        if (!userConfig) return;
-        
-        // Find repo by URL to get ID
-        const repo = userConfig.skills.find(s => s.url === repoUrl);
-        if (!repo) {
-            Message.error(t('skills.repoNotFound'));
-            return;
-        }
-
-        await window.api['git:delete'](repo.id);
-        await fetchUserConfig();
-        Message.success(t('skills.deleteSuccess'));
-    } catch (error) {
-        console.error(error);
-        Message.error(t('skills.deleteFailed'));
-    }
-  };
-
-  const handleOpenExternal = (url: string) => {
-      window.api['app:open-external'](url);
-  };
+    fetchPlatforms();
+  }, [fetchUserConfig, fetchPlatforms]);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="h-full flex flex-col gap-4">
+      <div className="flex items-center justify-between">
         <Typography.Title heading={4} className="m-0">
             {t('skills.title')}
         </Typography.Title>
@@ -87,56 +29,40 @@ export default function Skills() {
         </Button>
       </div>
 
-      <div className="bg-bg-2 rounded-lg shadow-sm border border-border-2">
-          <List
-            noDataElement={<Empty description={t('skills.noRepos')} />}
-            dataSource={userConfig?.skills || []}
-            render={(repo, index) => (
-                <List.Item
-                    key={index}
-                    actions={[
-                        <Button 
-                            key="open" 
-                            type="text" 
-                            icon={<IconLaunch />} 
-                            onClick={() => handleOpenExternal(repo.url)}
-                        />,
-                        <Popconfirm
-                            key="delete"
-                            title={t('skills.deleteRepo')}
-                            onOk={() => handleDelete(repo.url)}
-                        >
-                            <Button type="text" status="danger" icon={<IconDelete />} />
-                        </Popconfirm>
-                    ]}
-                >
-                    <List.Item.Meta
-                        avatar={<IconBranch className="text-xl text-text-3" />}
-                        title={repo.name}
-                        description={repo.url !== repo.name ? repo.url : undefined}
-                    />
-                </List.Item>
-            )}
-          />
+      <div className="flex-1 flex gap-4 min-h-0">
+          <div className="flex-1 bg-bg-2 rounded-lg shadow-sm border border-border-2 flex flex-col min-w-0 overflow-hidden">
+             <div className="p-4 border-b border-border-2 font-bold flex justify-between items-center">
+                 <span>{t('skills.repositories')}</span>
+                 <Button 
+                    shape="circle" 
+                    icon={<IconSync />} 
+                    onClick={async (e) => {
+                        e.stopPropagation();
+                        // Trigger specific refresh for all repos
+                        const repos = useStore.getState().userConfig?.skills || [];
+                        await Promise.all(repos.map(r => useStore.getState().checkRepoUpdate(r.id)));
+                    }}
+                 />
+             </div>
+             <div className="flex-1 overflow-auto">
+                 <RepoList 
+                    onSelectRepo={setSelectedRepoId} 
+                    selectedRepoId={selectedRepoId} 
+                />
+             </div>
+          </div>
+          
+          <div className="flex-[2] bg-bg-2 rounded-lg shadow-sm border border-border-2 flex flex-col min-w-0 overflow-hidden">
+             <div className="p-4 flex-1 overflow-auto">
+                <SkillList repoId={selectedRepoId} />
+             </div>
+          </div>
       </div>
 
-      <Modal 
-        title={t('skills.addRepo')}
+      <AddRepoModal 
         visible={isModalOpen}
-        onOk={handleAddRepo}
         onCancel={() => setIsModalOpen(false)}
-        confirmLoading={isAdding}
-        unmountOnExit
-      >
-          <Form form={form} layout="vertical">
-              <FormItem label={t('skills.repoUrl')} field="url" rules={[{ required: true }]}>
-                  <Input placeholder={t('skills.repoUrlPlaceholder')} />
-              </FormItem>
-              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                  {t('skills.repoUrlDesc')}
-              </Typography.Text>
-          </Form>
-      </Modal>
+      />
     </div>
   );
 }
