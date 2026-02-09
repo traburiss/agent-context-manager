@@ -93,7 +93,13 @@
         "dmg",
         "zip"
       ],
-      "icon": "resources/icon.png"
+      "icon": "resources/icon.png",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "signIgnore": [
+        ".*"
+      ]
     },
     "linux": {
       "target": [
