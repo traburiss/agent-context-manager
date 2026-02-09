@@ -1,8 +1,12 @@
 import { Platform } from '../../shared/types';
+import { shell } from 'electron';
 import { ConfigService } from './config';
+import fs from 'fs-extra';
 
 export class PlatformService {
   constructor(private configService: ConfigService) {}
+
+  // ... (existing methods list, get, create, update, delete, getPresets)
 
   async list(): Promise<Platform[]> {
     const config = await this.configService.getUserConfig();
@@ -33,18 +37,15 @@ export class PlatformService {
       id,
       linkedSkills: platform.linkedSkills || [],
       linkedRules: platform.linkedRules || [],
-      // We save paths AS IS (potentially with variables)
-      // The frontend should ensure it sends variables if desired, or resolved paths if not.
-      // Ideally, we might want to "un-resolve" paths here, but that's complex. 
-      // For now we assume input paths are what we want to store.
     };
 
-    config.agents.push(newPlatform);
+    const platformToSave = {
+        ...newPlatform,
+        linkedSkills: newPlatform.linkedSkills || [],
+        linkedRules: newPlatform.linkedRules || []
+    };
+    config.agents.push(platformToSave);
     await this.configService.setUserConfig({ agents: config.agents });
-
-    // Return the created platform (with variables resolved if we called list(), but here we return what we saved?)
-    // Consistency: list() returns resolved. create() should probably return what was passed + id.
-    // If we want consistency, we should return resolved version.
     
     return {
       ...newPlatform,
@@ -61,11 +62,6 @@ export class PlatformService {
       throw new Error(`Platform with ID ${platform.id} does not exist`);
     }
 
-    // Update the agent in the list
-    // Warning: If 'platform' comes from frontend with RESOLVED paths, we might be overwriting variables with absolute paths.
-    // This is a known trade-off unless we have a separate DTO. 
-    // For this refactor, we accept that update might persist resolved paths.
-    
     const updatedPlatform = { ...config.agents[index], ...platform };
     config.agents[index] = updatedPlatform;
 
@@ -92,7 +88,46 @@ export class PlatformService {
     return this.configService.getPresets();
   }
 
+  async openPath(pathStr: string): Promise<string> {
+    try {
+      const resolvedPath = this.configService.resolveVariables(pathStr);
+      // Check if path exists
+      if (!await fs.pathExists(resolvedPath)) {
+          console.error(`Path does not exist: ${resolvedPath}`);
+          return `Path does not exist: ${resolvedPath}`;
+      }
+      
+      console.log(`Opening path: ${resolvedPath}`);
+      const error = await shell.openPath(resolvedPath);
+      if (error) {
+          console.error(`Error opening path: ${error}`);
+      }
+      return error;
+    } catch (err: unknown) {
+      console.error('Failed to open path:', err);
+      return err instanceof Error ? err.message : 'Unknown error';
+    }
+  }
+
+  async openFileLocation(pathStr: string): Promise<string> {
+      try {
+          const resolvedPath = this.configService.resolveVariables(pathStr);
+           if (!await fs.pathExists(resolvedPath)) {
+                console.error(`File does not exist: ${resolvedPath}`);
+                return `File does not exist: ${resolvedPath}`;
+            }
+
+          console.log(`Showing item in folder: ${resolvedPath}`);
+          shell.showItemInFolder(resolvedPath);
+          return '';
+      } catch (err: unknown) {
+          console.error('Failed to open file location:', err);
+          return err instanceof Error ? err.message : 'Unknown error';
+      }
+  }
+
   private generateId(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   }
 }
+

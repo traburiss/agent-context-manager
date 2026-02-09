@@ -8,7 +8,7 @@
 
 ### 层级 1: 系统配置 (System Config)
 
-* **位置**: `[AppData]/AgentContextManager/config.yaml`
+* **位置**: `~/.config/acm/config.yaml`
 * **用途**: 引导应用启动，存储全局环境设置。
 * **特性**: 变更频率低，由应用自动维护。
 
@@ -25,7 +25,7 @@
 
 ### 3.1 系统配置文件
 
-**路径**: `%APPDATA%/AgentContextManager/config.yaml`
+**路径**: `~/.config/acm/config.yaml`
 
 ```yaml
 # ===================================================================

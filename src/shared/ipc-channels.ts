@@ -15,6 +15,8 @@ export enum IpcChannels {
   CreatePlatform = 'platform:create',
   UpdatePlatform = 'platform:update',
   DeletePlatform = 'platform:delete',
+  OpenPlatformDir = 'platform:open-dir',
+  OpenPlatformFile = 'platform:open-file',
 
   // Git
   CheckGitInstalled = 'git:check-installed',
@@ -67,6 +69,8 @@ export interface IpcApi {
   [IpcChannels.CreatePlatform]: (platform: Omit<Platform, 'id'>) => Promise<Platform>;
   [IpcChannels.UpdatePlatform]: (platform: Platform) => Promise<Platform>;
   [IpcChannels.DeletePlatform]: (id: string) => Promise<void>;
+  [IpcChannels.OpenPlatformDir]: (path: string) => Promise<string>;
+  [IpcChannels.OpenPlatformFile]: (path: string) => Promise<string>;
 
   // Git
   [IpcChannels.CheckGitInstalled]: () => Promise<boolean>;

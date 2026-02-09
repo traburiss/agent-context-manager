@@ -45,6 +45,8 @@ export function registerIpcHandlers(appDataPath: string) {
   handle(IpcChannels.CreatePlatform, (platform) => platformService.create(platform));
   handle(IpcChannels.UpdatePlatform, (platform) => platformService.update(platform));
   handle(IpcChannels.DeletePlatform, (id) => platformService.delete(id));
+  handle(IpcChannels.OpenPlatformDir, (path) => platformService.openPath(path));
+  handle(IpcChannels.OpenPlatformFile, (path) => platformService.openFileLocation(path));
 
   // Git
   handle(IpcChannels.CheckGitInstalled, () => gitService.checkGitInstalled());

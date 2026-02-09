@@ -54,8 +54,8 @@ xattr -cr /Applications/AgentContextManager.app
 
 本工具采用 **分层存储策略**：
 
-1. **系统配置**：`%APPDATA%/AgentContextManager/config.yaml`
-    - 存储 Base Dir 路径、语言、主题等。
+1. **系统配置**：`~/.config/acm/config.yaml`
+    - 存储 Base Dir 路径、语言、主题、预设模板等。
 2. **用户数据**：`<Manager Base Dir>/config/`
     - `ai-agent.yaml`: Agent 实例与 Skills/Rules 关联
     - `skills.yaml`: Skill 仓库源

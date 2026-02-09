@@ -16,6 +16,8 @@ const api: IpcApi = {
   [IpcChannels.CreatePlatform]: (platform) => ipcRenderer.invoke(IpcChannels.CreatePlatform, platform),
   [IpcChannels.UpdatePlatform]: (platform) => ipcRenderer.invoke(IpcChannels.UpdatePlatform, platform),
   [IpcChannels.DeletePlatform]: (id) => ipcRenderer.invoke(IpcChannels.DeletePlatform, id),
+  [IpcChannels.OpenPlatformDir]: (path) => ipcRenderer.invoke(IpcChannels.OpenPlatformDir, path),
+  [IpcChannels.OpenPlatformFile]: (path) => ipcRenderer.invoke(IpcChannels.OpenPlatformFile, path),
 
   // Git
   [IpcChannels.CheckGitInstalled]: () => ipcRenderer.invoke(IpcChannels.CheckGitInstalled),

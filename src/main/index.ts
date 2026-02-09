@@ -59,7 +59,9 @@ app.whenReady().then(() => {
   // And `getPresets`: `path.join(process.cwd(), 'resources', 'presets')`.
   // So `baseDir` is for user references.
   
-  registerIpcHandlers(app.getPath('userData'));
+  // Use ~/.config/acm/config.yaml for system config
+  const configPath = join(app.getPath('home'), '.config', 'acm');
+  registerIpcHandlers(configPath);
   createWindow();
 });
 

@@ -1,3 +1,0 @@
-name: Gemini CLI
-skillsDir: '${HOME}/.gemini/cli/skills'
-rulesFile: '${HOME}/.gemini/cli/AGENTS.MD'

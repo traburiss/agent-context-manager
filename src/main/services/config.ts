@@ -68,6 +68,35 @@ export class ConfigService {
         console.error('Failed to save user config:', error);
       }
     }, 500);
+
+
+    // Ensure config directory exists
+    fs.ensureDirSync(this.appDataPath);
+  }
+
+  private async loadInitialPresets(): Promise<PlatformPreset[]> {
+    const presetsDir = path.join(process.cwd(), 'resources', 'presets');
+    const builtInPresets: PlatformPreset[] = [];
+    
+    if (await fs.pathExists(presetsDir)) {
+      const files = await fs.readdir(presetsDir);
+      for (const file of files.filter(f => f.endsWith('.yaml'))) {
+        try {
+          const content = await fs.readFile(path.join(presetsDir, file), 'utf-8');
+          const data = yaml.load(content) as PlatformPreset;
+          builtInPresets.push({
+            ...data,
+            // We resolve variables when using them, but storing them as-is in config is better for portability?
+            // Actually, if we store them in config.yaml, we should probably store them with variables
+            // so they can be adapted if user moves config (though config is in home).
+            // Let's store as-is.
+          });
+        } catch (error) {
+          console.error(`Failed to load preset ${file}:`, error);
+        }
+      }
+    }
+    return builtInPresets;
   }
 
   /**
@@ -90,8 +119,21 @@ export class ConfigService {
       if (await fs.pathExists(this.systemConfigPath)) {
         const content = await fs.readFile(this.systemConfigPath, 'utf-8');
         this.systemConfig = { ...DEFAULT_SYSTEM_CONFIG, ...yaml.load(content) as Partial<SystemConfig> };
+        
+        // If presets is empty (e.g. old config), try to populate it?
+        // Or should we always merge built-in presets?
+        // The requirement says "presets also in config.yaml".
+        // So we should populate it once.
+        if (!this.systemConfig.presets || this.systemConfig.presets.length === 0) {
+             const initialPresets = await this.loadInitialPresets();
+             this.systemConfig.presets = initialPresets;
+             await this.saveSystemConfigDebounced(this.systemConfig);
+        }
+
       } else {
         this.systemConfig = { ...DEFAULT_SYSTEM_CONFIG };
+        // Load initial presets
+        this.systemConfig.presets = await this.loadInitialPresets();
         // Save default config immediately
         await this.saveSystemConfigDebounced(this.systemConfig);
       }
@@ -194,29 +236,15 @@ export class ConfigService {
    * Presets
    */
   async getPresets(): Promise<PlatformPreset[]> {
-    const presetsDir = path.join(process.cwd(), 'resources', 'presets');
-    const systemPresets = this.systemConfig?.presets || [];
-    
-    const builtInPresets: PlatformPreset[] = [];
-    
-    if (await fs.pathExists(presetsDir)) {
-      const files = await fs.readdir(presetsDir);
-      for (const file of files.filter(f => f.endsWith('.yaml'))) {
-        try {
-          const content = await fs.readFile(path.join(presetsDir, file), 'utf-8');
-          const data = yaml.load(content) as PlatformPreset;
-          builtInPresets.push({
-            ...data,
-            skillsDir: this.resolveVariables(data.skillsDir),
-            rulesFile: this.resolveVariables(data.rulesFile)
-          });
-        } catch (error) {
-          console.error(`Failed to load preset ${file}:`, error);
-        }
-      }
+    if (!this.systemConfig) {
+        await this.loadSystemConfig();
     }
-
-    return [...builtInPresets, ...systemPresets];
+    // Return presets from system config, resolving variables
+    return (this.systemConfig?.presets || []).map(preset => ({
+        ...preset,
+        skillsDir: this.resolveVariables(preset.skillsDir),
+        rulesFile: this.resolveVariables(preset.rulesFile)
+    }));
   }
 
   public resolveVariables(value: string): string {

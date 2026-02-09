@@ -1,3 +1,0 @@
-name: Codex
-skillsDir: '${HOME}/.codex/skills'
-rulesFile: '${HOME}/.codex/AGENTS.MD'

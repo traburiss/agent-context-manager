@@ -1,3 +1,0 @@
-name: Qoder
-skillsDir: '${HOME}/.qoder/skills'
-rulesFile: '${HOME}/.qoder/rules.md'
