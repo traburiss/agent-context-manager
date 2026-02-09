@@ -15,7 +15,8 @@
     "success": "成功",
     "error": "错误",
     "warning": "警告",
-    "actions": "操作"
+    "actions": "操作",
+    "selectedItems": "已选择 {{count}} 项"
   },
   "nav": {
     "agents": "AI Agents",
@@ -112,7 +113,16 @@
     "skillName": "技能名称",
     "skillsInRepo": "{{repo}} 中的技能",
     "skillsFound": "找到 {{count}} 个技能",
-    "repositories": "仓库列表"
+    "repositories": "仓库列表",
+    "batchLinkSuccess": "已将 {{count}} 个技能链接到 {{platform}}",
+    "batchLinkFailed": "链接技能失败",
+    "batchUnlinkSuccess": "已从 {{platform}} 取消链接 {{count}} 个技能",
+    "batchUnlinkFailed": "取消链接技能失败",
+    "noSkillsLinked": "未链接任何技能",
+    "noSkillsUnlinked": "未取消链接任何技能",
+    "linkTo": "链接到...",
+    "unlinkFrom": "从...断开",
+    "recommendedRepos": "推荐仓库"
   },
   "rules": {
     "title": "规则",

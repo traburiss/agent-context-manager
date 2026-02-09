@@ -15,7 +15,8 @@
     "success": "Success",
     "error": "Error",
     "warning": "Warning",
-    "actions": "Actions"
+    "actions": "Actions",
+    "selectedItems": "Selected {{count}} items"
   },
   "nav": {
     "agents": "AI AGENT",
@@ -105,7 +106,16 @@
     "skillName": "Skill Name",
     "skillsInRepo": "Skills in {{repo}}",
     "skillsFound": "{{count}} skills found",
-    "repositories": "Repositories"
+    "repositories": "Repositories",
+    "batchLinkSuccess": "Linked {{count}} skills to {{platform}}",
+    "batchLinkFailed": "Failed to link skills",
+    "batchUnlinkSuccess": "Unlinked {{count}} skills from {{platform}}",
+    "batchUnlinkFailed": "Failed to unlink skills",
+    "noSkillsLinked": "No skills were linked",
+    "noSkillsUnlinked": "No skills were unlinked",
+    "linkTo": "Link to...",
+    "unlinkFrom": "Unlink from...",
+    "recommendedRepos": "Recommended Repositories"
   },
   "rules": {
     "title": "Rules",

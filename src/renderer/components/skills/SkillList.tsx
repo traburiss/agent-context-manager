@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../../stores/useStore';
-import { Table, Checkbox, Message, Typography, Button, Tooltip } from '@arco-design/web-react';
+import { Table, Checkbox, Message, Typography, Button, Tooltip, Space, Dropdown, Menu } from '@arco-design/web-react';
 import { Skill } from '../../../shared/types';
-import { IconFolder } from '@arco-design/web-react/icon';
+import { IconFolder, IconDown, IconLink, IconStop } from '@arco-design/web-react/icon';
 
 interface SkillListProps {
     repoId: string | null;
@@ -12,6 +12,7 @@ interface SkillListProps {
 export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
     const { t } = useTranslation();
     const { skills, platforms, linkSkill, unlinkSkill } = useStore();
+    const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
 
     if (!repoId) {
         return <div className="p-8 text-center text-gray-500">{t('skills.selectRepoToView')}</div>;
@@ -35,6 +36,54 @@ export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
     
     const handleOpenSkillFolder = (path: string) => {
          window.api['platform:open-dir'](path);
+    };
+
+    const handleBatchLink = async (platformId: string) => {
+        try {
+            const platform = platforms.find(p => p.id === platformId);
+            if (!platform) return;
+
+            let successCount = 0;
+            for (const skillId of selectedRowKeys) {
+                const skill = repoSkills.find(s => s.id === skillId);
+                if (skill && !skill.linkedPlatforms?.includes(platformId)) {
+                    await linkSkill(skill.id, platformId);
+                    successCount++;
+                }
+            }
+            if (successCount > 0) {
+                 Message.success(t('skills.batchLinkSuccess', { count: successCount, platform: platform.name }));
+            } else {
+                 Message.info(t('skills.noSkillsLinked'));
+            }
+            setSelectedRowKeys([]);
+        } catch (err) {
+            Message.error(`${t('skills.batchLinkFailed')}: ${(err as Error).message}`);
+        }
+    };
+
+    const handleBatchUnlink = async (platformId: string) => {
+        try {
+            const platform = platforms.find(p => p.id === platformId);
+            if (!platform) return;
+
+            let successCount = 0;
+            for (const skillId of selectedRowKeys) {
+                const skill = repoSkills.find(s => s.id === skillId);
+                 if (skill && skill.linkedPlatforms?.includes(platformId)) {
+                    await unlinkSkill(skill.id, platformId);
+                    successCount++;
+                }
+            }
+             if (successCount > 0) {
+                 Message.success(t('skills.batchUnlinkSuccess', { count: successCount, platform: platform.name }));
+            } else {
+                 Message.info(t('skills.noSkillsUnlinked'));
+            }
+            setSelectedRowKeys([]);
+        } catch (err) {
+            Message.error(`${t('skills.batchUnlinkFailed')}: ${(err as Error).message}`);
+        }
     };
 
     const columns: any[] = [
@@ -79,15 +128,59 @@ export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
         }))
     ];
 
+    const linkMenu = (
+        <Menu onClickMenuItem={(key) => handleBatchLink(key)}>
+            {platforms.map(p => (
+                <Menu.Item key={p.id}>{p.name}</Menu.Item>
+            ))}
+        </Menu>
+    );
+
+    const unlinkMenu = (
+        <Menu onClickMenuItem={(key) => handleBatchUnlink(key)}>
+            {platforms.map(p => (
+                <Menu.Item key={p.id}>{p.name}</Menu.Item>
+            ))}
+        </Menu>
+    );
+
     return (
         <div className="h-full flex flex-col">
-            <div className="mb-4">
-                <Typography.Title heading={6} style={{ margin: 0 }}>
-                    {t('skills.skillsInRepo', { repo: repoId })}
-                </Typography.Title>
-                <Typography.Text type="secondary">
-                     {t('skills.skillsFound', { count: repoSkills.length })}
-                </Typography.Text>
+            <div className="mb-4 flex justify-between items-center">
+                <div>
+                     <Typography.Title heading={6} style={{ margin: 0 }}>
+                        {t('skills.skillsInRepo', { repo: repoId })}
+                    </Typography.Title>
+                    <Typography.Text type="secondary">
+                         {t('skills.skillsFound', { count: repoSkills.length })}
+                    </Typography.Text>
+                </div>
+                
+                {selectedRowKeys.length > 0 && (
+                    <Space>
+                        <span className="text-sm text-gray-500 mr-2">
+                            {t('common.selectedItems', { count: selectedRowKeys.length })}
+                        </span>
+                         <Dropdown droplist={linkMenu} trigger="click">
+                            <Button type="primary" size="small">
+                                <Space>
+                                    <IconLink />
+                                    {t('skills.linkTo')}
+                                    <IconDown />
+                                </Space>
+                            </Button>
+                        </Dropdown>
+                         <Dropdown droplist={unlinkMenu} trigger="click">
+                            <Button status="danger" size="small">
+                                <Space>
+                                    <IconStop />
+                                    {t('skills.unlinkFrom')}
+                                    <IconDown />
+                                </Space>
+                            </Button>
+                        </Dropdown>
+                    </Space>
+                )}
             </div>
             <Table
                 data={repoSkills}
@@ -95,6 +188,14 @@ export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
                 rowKey="id"
                 pagination={false}
                 scroll={{ x: true, y: true }}
+                rowSelection={{
+                    type: 'checkbox',
+                    selectedRowKeys,
+                    onChange: (selectedRowKeys) => {
+                        setSelectedRowKeys(selectedRowKeys);
+                    },
+                    checkAll: true
+                }}
             />
         </div>
     );

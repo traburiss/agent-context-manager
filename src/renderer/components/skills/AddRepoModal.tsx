@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Form, Input, Message, Button } from '@arco-design/web-react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../../stores/useStore';
@@ -8,12 +8,20 @@ interface AddRepoModalProps {
     onCancel: () => void;
 }
 
+const PRESET_REPOS = [
+    { name: 'awesome-claude-skills', url: 'https://github.com/ComposioHQ/awesome-claude-skills' },
+    { name: 'baoyu-skills', url: 'https://github.com/JimLiu/baoyu-skills.git' },
+    { name: 'anthropics-skills', url: 'https://github.com/anthropics/skills' },
+    { name: 'myclaude', url: 'https://github.com/cexll/myclaude' }
+];
+
 export const AddRepoModal: React.FC<AddRepoModalProps> = ({ visible, onCancel }) => {
     const { t } = useTranslation();
     const [form] = Form.useForm();
     const { addRepo } = useStore();
     const [loading, setLoading] = useState(false);
     const [logs, setLogs] = useState<string[]>([]);
+    const logContainerRef = useRef<HTMLDivElement>(null);
     
     useEffect(() => {
         if (visible) {
@@ -23,12 +31,18 @@ export const AddRepoModal: React.FC<AddRepoModalProps> = ({ visible, onCancel })
                     setLogs(prev => [...prev, message]);
                 });
                 return () => {
-                   removeListener();
+                    removeListener();
                 };
             }
         }
         return () => {};
     }, [visible]);
+
+    useEffect(() => {
+        if (logContainerRef.current) {
+            logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+        }
+    }, [logs]);
 
     const handleSubmit = async () => {
         try {
@@ -48,6 +62,10 @@ export const AddRepoModal: React.FC<AddRepoModalProps> = ({ visible, onCancel })
         }
     };
 
+    const handlePresetSelect = (url: string) => {
+        form.setFieldValue('url', url);
+    };
+
     return (
         <Modal
             title={t('skills.addRepo')}
@@ -56,13 +74,31 @@ export const AddRepoModal: React.FC<AddRepoModalProps> = ({ visible, onCancel })
             onCancel={onCancel}
             style={{ width: 600 }}
         >
+            
             <Form form={form} layout="vertical">
                 <Form.Item label={t('skills.repoUrl')} field="url" rules={[{ required: true, message: t('skills.repoUrlRequired') }]}>
                     <Input placeholder={t('skills.repoUrlPlaceholder')} />
                 </Form.Item>
             </Form>
 
-            <div className="flex justify-end gap-2 mb-4">
+            <div className="mb-6">
+                <div className="flex flex-wrap gap-2">
+                    {t('skills.recommendedRepos')}
+                    {PRESET_REPOS.map(repo => (
+                        <Button 
+                            key={repo.url} 
+                            size="mini" 
+                            type="secondary"
+                            onClick={() => handlePresetSelect(repo.url)}
+                            disabled={loading}
+                        >
+                            {repo.name}
+                        </Button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mb-6">
                 <Button onClick={onCancel} loading={loading}>
                     {t('common.cancel')}
                 </Button>
@@ -71,7 +107,10 @@ export const AddRepoModal: React.FC<AddRepoModalProps> = ({ visible, onCancel })
                 </Button>
             </div>
             
-            <div className="p-2 font-mono text-xs h-40 overflow-y-auto rounded border bg-black text-green-400 border-gray-700">
+            <div 
+                ref={logContainerRef}
+                className="p-2 font-mono text-xs h-40 overflow-y-auto rounded border bg-black text-green-400 border-gray-700"
+            >
                 {logs.length === 0 ? (
                     <div >{t('skills.readyToClone')}</div>
                 ) : (

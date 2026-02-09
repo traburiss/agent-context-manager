@@ -108,15 +108,36 @@ export class SkillService {
             throw new Error(`Platform with ID ${platformId} not found`);
         }
 
-        // 1. Create Symlink
-        // Target: skill.localPath
-        // Link Path: platform.skillsDir / skill.name (or repoId-skillId?)
-        // To avoid conflicts if multiple repos have same skill name, maybe use folder structure?
-        // But usually skills are flat in the agent's skill dir.
-        // Let's use skill.name for now, or if conflict, prepending repo name. 
-        // Design doc says: "linkName = path.basename(sourcePath)"
-        
-        await this.symlinkService.createSymlink(skill.localPath, path.join(platform.skillsDir, skill.name));
+        const userConfig = await this.configService.getUserConfig();
+        const repo = userConfig.skills.find(r => r.id === skill.repoId);
+
+        // 1. Determine Link Path
+        let linkName = skill.name;
+        const defaultLinkPath = path.join(platform.skillsDir, linkName);
+
+        // Check for conflict
+        if (await fs.pathExists(defaultLinkPath)) {
+            const stats = await fs.lstat(defaultLinkPath);
+            let isSame = false;
+            
+            if (stats.isSymbolicLink()) {
+                const currentTarget = await fs.readlink(defaultLinkPath);
+                if (path.resolve(currentTarget) === path.resolve(skill.localPath)) {
+                    isSame = true;
+                }
+            }
+
+            if (!isSame) {
+                // Name conflict! Auto prepend org name
+                const orgName = this.extractOrgName(repo?.url || '');
+                if (orgName) {
+                    linkName = `${orgName}-${skill.name}`;
+                }
+            }
+        }
+
+        const finalLinkPath = path.join(platform.skillsDir, linkName);
+        await this.symlinkService.createSymlink(skill.localPath, finalLinkPath);
 
         // 2. Update Configuration
         if (!platform.linkedSkills) {
@@ -151,19 +172,57 @@ export class SkillService {
         }
 
         // 2. Remove Symlink
-        // We need the skill name to know which symlink to remove. 
-        // If skill object is available:
         if (skill) {
-            const linkPath = path.join(platform.skillsDir, skill.name);
-            await this.symlinkService.removeSymlink(linkPath);
-        } else {
-            // Fallback: try to find a symlink that points to... wait, cannot know.
-            // Maybe we should store the symlink name in the config?
-            // For now, if skill is gone, we might leave a dangling symlink or user has to manually clean.
-            // Or we could iterate all symlinks in skillsDir and check if they point to the skill (if we knew the path).
-            // But we don't know the path if the repo is gone.
-            // Acceptance: If skill is missing, just update config.
+            // Check both possible names: default and prefixed
+            const userConfig = await this.configService.getUserConfig();
+            const repo = userConfig.skills.find(r => r.id === skill.repoId);
+            const orgName = this.extractOrgName(repo?.url || '');
+            
+            const possibleNames = [skill.name];
+            if (orgName) {
+                possibleNames.push(`${orgName}-${skill.name}`);
+            }
+
+            for (const name of possibleNames) {
+                const linkPath = path.join(platform.skillsDir, name);
+                if (await fs.pathExists(linkPath)) {
+                    const stats = await fs.lstat(linkPath);
+                    if (stats.isSymbolicLink()) {
+                        const target = await fs.readlink(linkPath);
+                        if (path.resolve(target) === path.resolve(skill.localPath)) {
+                            await this.symlinkService.removeSymlink(linkPath);
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    private extractOrgName(url: string): string {
+        if (!url) return '';
+        
+        // Handle git@github.com:org/repo.git
+        const sshMatch = url.match(/[:/]([^/]+)\/[^/]+(?:\.git)?$/);
+        if (sshMatch) {
+            return sshMatch[1];
+        }
+
+        // Handle https://github.com/org/repo.git
+        try {
+            const parsed = new URL(url);
+            const parts = parsed.pathname.split('/').filter(Boolean);
+            if (parts.length >= 2) {
+                return parts[0];
+            }
+        } catch {
+            // Fallback for non-standard URLs
+            const parts = url.split('/').filter(Boolean);
+            if (parts.length >= 2) {
+                return parts[parts.length - 2];
+            }
+        }
+
+        return '';
     }
 }
 

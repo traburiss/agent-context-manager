@@ -77,7 +77,7 @@ export const RepoList: React.FC<RepoListProps> = ({ onSelectRepo, selectedRepoId
         {
             title: t('skills.status'),
             width: 70,
-            align: 'center',
+            align: 'center' as const,
             dataIndex: 'updateStatus',
             render: (status: string | undefined, record: SkillRepo) => (
                 <div onClick={() => onSelectRepo(record.id)}>
@@ -110,9 +110,8 @@ export const RepoList: React.FC<RepoListProps> = ({ onSelectRepo, selectedRepoId
                     </Tooltip>
                     <Tooltip content={t('skills.checkUpdate')}>
                         <Button 
-                            icon={<IconSync />} 
+                            icon={<IconSync spin={record.updateStatus === 'checking'}/>} 
                             shape="circle"
-                            loading={record.updateStatus === 'checking'}
                             onClick={(e) => handleCheckUpdate(record.id, e as unknown as React.MouseEvent)}
                         />
                     </Tooltip>
