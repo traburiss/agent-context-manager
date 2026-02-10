@@ -7,6 +7,15 @@ export class SymlinkService {
   
   async createSymlink(target: string, linkPath: string): Promise<void> {
     const parentDir = path.dirname(linkPath);
+
+    // Check if parent directory exists as a file
+    if (await fs.pathExists(parentDir)) {
+        const stats = await fs.lstat(parentDir);
+        if (!stats.isDirectory()) {
+             throw new Error(`Parent path ${parentDir} exists and is not a directory`);
+        }
+    }
+    
     await fs.ensureDir(parentDir);
 
     if (await fs.pathExists(linkPath)) {
@@ -31,7 +40,7 @@ export class SymlinkService {
        // Check for admin rights error (heuristic)
        // eslint-disable-next-line @typescript-eslint/no-explicit-any
        if ((error as any).code === 'EPERM') {
-           throw new Error('Permission denied. Administrator rights might be required to create symbolic links.', { cause: error });
+           throw new Error('Permission denied. Administrator rights might be required to create symbolic links, or activate Developer Mode.', { cause: error });
        }
        throw error;
     }

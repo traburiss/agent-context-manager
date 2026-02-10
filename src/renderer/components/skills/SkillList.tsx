@@ -47,6 +47,20 @@ export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
     );
   }, [repoSkills, searchText]);
 
+  const getErrorMessage = (err: Error) => {
+    console.info('get_error', err)
+    const msg = err.message || '';
+    if (msg.includes('Permission denied')) return t('skills.linkErrorPermission');
+    if (msg.includes('exists and is not a symbolic link')) return t('skills.linkErrorOccupied');
+    
+    const parentDirMatch = msg.match(/Parent path (.+) exists and is not a directory/);
+    if (parentDirMatch) {
+        return t('skills.linkErrorParentNotDir', { path: parentDirMatch[1] });
+    }
+
+    return t('skills.linkErrorUnknown', { message: msg });
+  };
+
   const handleLinkToggle = async (skillId: string, platformId: string, checked: boolean) => {
     try {
       if (checked) {
@@ -57,7 +71,7 @@ export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
         Message.success(t('skills.skillUnlinked'));
       }
     } catch (err) {
-      Message.error(`${t('skills.linkFailed')}: ${(err as Error).message}`);
+      Message.error(getErrorMessage(err as Error));
     }
   };
 
@@ -85,7 +99,7 @@ export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
       }
       setSelectedRowKeys([]);
     } catch (err) {
-      Message.error(`${t('skills.batchLinkFailed')}: ${(err as Error).message}`);
+      Message.error(getErrorMessage(err as Error));
     }
   };
 

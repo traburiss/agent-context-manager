@@ -234,21 +234,29 @@ export const useStore = create<AppState>((set, get) => ({
 
   linkSkill: async (skillId, platformId) => {
     try {
-        await window.api[IpcChannels.LinkSkill](skillId, platformId);
+        const result = await window.api[IpcChannels.LinkSkill](skillId, platformId);
+        if (!result.success) {
+            throw new Error(result.error);
+        }
         await get().fetchSkills(); // Refresh to update linked status
         await get().fetchPlatforms(); // Refresh platforms to see linked skills
     } catch (error) {
         set({ error: (error as Error).message });
+        throw error;
     }
   },
 
   unlinkSkill: async (skillId, platformId) => {
     try {
-        await window.api[IpcChannels.UnlinkSkill](skillId, platformId);
+        const result = await window.api[IpcChannels.UnlinkSkill](skillId, platformId);
+        if (!result.success) {
+            throw new Error(result.error);
+        }
         await get().fetchSkills();
         await get().fetchPlatforms();
     } catch (error) {
         set({ error: (error as Error).message });
+        throw error;
     }
   },
 

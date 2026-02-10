@@ -84,8 +84,8 @@ export interface IpcApi {
 
   // Skill
   [IpcChannels.ListSkills]: () => Promise<Skill[]>;
-  [IpcChannels.LinkSkill]: (skillId: string, platformId: string) => Promise<void>;
-  [IpcChannels.UnlinkSkill]: (skillId: string, platformId: string) => Promise<void>;
+  [IpcChannels.LinkSkill]: (skillId: string, platformId: string) => Promise<{ success: boolean; error?: string }>;
+  [IpcChannels.UnlinkSkill]: (skillId: string, platformId: string) => Promise<{ success: boolean; error?: string }>;
 
   // Symlink
   [IpcChannels.CreateSymlink]: (target: string, path: string) => Promise<void>;
