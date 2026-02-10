@@ -1,0 +1,49 @@
+# electron-builder.yml
+
+appId: com.skillsmanager.app
+productName: Agent Context Manager
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - "out/**/*"
+  - "package.json"
+  - "resources/**/*"
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: resources/icon.png
+  requestedExecutionLevel: requireAdministrator
+
+mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  icon: resources/icon.png
+  hardenedRuntime: true
+  gatekeeperAssess: false
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+  icon: resources/icon.png
+  category: Development
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  installerIcon: resources/icon.png
+  uninstallerIcon: resources/icon.png
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
