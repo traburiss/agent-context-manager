@@ -12,6 +12,7 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: Math.floor(width * 0.8),
     height: Math.floor(height * 0.8),
+    autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, '../preload/preload.cjs'),
       contextIsolation: true,

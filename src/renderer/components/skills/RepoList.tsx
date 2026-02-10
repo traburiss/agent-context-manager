@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../../stores/useStore';
-import { Button, Table, Badge, Popconfirm, Message, Tooltip } from '@arco-design/web-react';
+import { Button, Table, Badge, Popconfirm, Message, Tooltip, Space, Typography } from '@arco-design/web-react';
 import { IconGithub, IconFolder, IconDelete, IconSync } from '@arco-design/web-react/icon';
 import { useTranslation } from 'react-i18next';
 import { SkillRepo } from '../../../shared/types';
@@ -58,19 +58,36 @@ export const RepoList: React.FC<RepoListProps> = ({ onSelectRepo, selectedRepoId
         }
     };
 
+const { Text } = Typography;
+
     const columns = [
         {
             title: t('skills.repository'),
             dataIndex: 'name',
             minWidth: 100,
             render: (_: unknown, record: SkillRepo) => (
-                <div className="flex flex-col cursor-pointer" onClick={() => onSelectRepo(record.id)}>
-                     <Tooltip content={record.name || 'Unknown'}>
-                        <div className="font-bold">{record.name}</div>
-                     </Tooltip>
-                     <Tooltip content={record.url || 'Unknown'}>
-                        <div className="text-xs text-text-3 truncate max-w-[200px]">{record.url}</div>
-                     </Tooltip>
+                <div 
+                    className="cursor-pointer" 
+                    onClick={() => onSelectRepo(record.id)}
+                    style={{ display: 'flex' }}
+                >
+                    <Space 
+                        direction="vertical" 
+                        size={0} 
+                    >
+                        <Tooltip content={record.name || 'Unknown'}>
+                            <Text bold>{record.name}</Text>
+                        </Tooltip>
+                        <Tooltip content={record.url || 'Unknown'}>
+                            <Text 
+                                type="secondary" 
+                                ellipsis 
+                                style={{ maxWidth: '200px', fontSize: '12px' }}
+                            >
+                                {record.url}
+                            </Text>
+                        </Tooltip>
+                    </Space>
                 </div>
             )
         },
@@ -80,11 +97,16 @@ export const RepoList: React.FC<RepoListProps> = ({ onSelectRepo, selectedRepoId
             align: 'center' as const,
             dataIndex: 'updateStatus',
             render: (status: string | undefined, record: SkillRepo) => (
-                <div onClick={() => onSelectRepo(record.id)}>
-                     <Tooltip content={status || 'Unknown'}>
-                        <Badge status={getStatusColor(status)} />
-                     </Tooltip>
-                     {record.behindCount ? <Badge count={record.behindCount} dot style={{ marginLeft: 4 }} /> : null}
+                <div 
+                    onClick={() => onSelectRepo(record.id)} 
+                    className="cursor-pointer"
+                >
+                    <Space>
+                        <Tooltip content={status || 'Unknown'}>
+                            <Badge status={getStatusColor(status)} />
+                        </Tooltip>
+                        {record.behindCount ? <Badge count={record.behindCount} dot style={{ marginLeft: 4 }} /> : null}
+                    </Space>
                 </div>
             )
         },
@@ -93,40 +115,40 @@ export const RepoList: React.FC<RepoListProps> = ({ onSelectRepo, selectedRepoId
             key: 'actions',
             width: 200,
             render: (_: unknown, record: SkillRepo) => (
-                <div className="flex gap-2">
+                <Space size="small">
                     <Tooltip content="Open Github">
                         <Button 
                             icon={<IconGithub />} 
                             shape="circle"
-                            onClick={(e) => handleOpenUrl(record.url, e as unknown as React.MouseEvent)}
+                            onClick={(e: React.MouseEvent) => handleOpenUrl(record.url, e)}
                         />
                     </Tooltip>
                     <Tooltip content={t('agents.openDir')}>
                          <Button 
                             icon={<IconFolder />} 
                             shape="circle" 
-                             onClick={(e) => handleOpenFolder(record.localPath, e as unknown as React.MouseEvent)}
+                             onClick={(e: React.MouseEvent) => handleOpenFolder(record.localPath, e)}
                         />
                     </Tooltip>
                     <Tooltip content={t('skills.checkUpdate')}>
                         <Button 
                             icon={<IconSync spin={record.updateStatus === 'checking'}/>} 
                             shape="circle"
-                            onClick={(e) => handleCheckUpdate(record.id, e as unknown as React.MouseEvent)}
+                            onClick={(e: React.MouseEvent) => handleCheckUpdate(record.id, e)}
                         />
                     </Tooltip>
                     <Popconfirm
                         title={t('skills.deleteRepo')}
-                        onOk={(e) => handleDelete(record.id, e as unknown as React.MouseEvent)}
+                        onOk={(e: React.MouseEvent) => handleDelete(record.id, e)}
                     >
                         <Button 
                             icon={<IconDelete />} 
                             shape="circle" 
                             status="danger"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e: React.MouseEvent) => e.stopPropagation()}
                         />
                     </Popconfirm>
-                </div>
+                </Space>
             )
         }
     ];
@@ -141,7 +163,8 @@ export const RepoList: React.FC<RepoListProps> = ({ onSelectRepo, selectedRepoId
             noDataElement={t('skills.noRepos')}
             onRow={(record) => ({
                 onClick: () => onSelectRepo(record.id),
-                className: `cursor-pointer hover:bg-fill-2 transition-colors ${selectedRepoId === record.id ? 'bg-fill-3' : ''}`
+                style: { cursor: 'pointer' },
+                className: `hover:bg-fill-2 transition-colors ${selectedRepoId === record.id ? 'bg-fill-3' : ''}`
             })}
         />
     );

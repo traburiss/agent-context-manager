@@ -85,7 +85,7 @@
   - [x] `window.api` 类型定义
   - [x] 补全所有设计文档中定义的接口
 
-## Phase 4: 前端界面 `[/]`
+## Phase 4: 前端界面 ✅
 
 ### 4.1 启动流程 ✅
 
@@ -143,16 +143,16 @@
   - [x] 部署矩阵: Skill x Agent (Checkbox)
   - [x] 触发 `skill:link` / `skill:unlink`
 
-### 4.5 Rules 管理 (Rules Tab)
+### 4.5 Rules 管理 (Rules Tab) ✅
 
 > 参考: [Design 04_rules](docs/design/04_rules.md)
 
-- [ ] **Rules 列表视图**
-  - [ ] 展示 Rule 文件列表
-  - [ ] 部署状态概览
-- [ ] **Rule 编辑器**
-  - [ ] Markdown 编辑预览
-  - [ ] 部署配置 (选择生效的 Agents)
+- [x] **Rules 列表视图**
+  - [x] 展示 Rule 文件列表
+  - [x] 部署状态概览
+- [x] **Rule 编辑器**
+  - [x] Markdown 编辑预览
+  - [x] 部署配置 (选择生效的 Agents)
 
 ## Phase 5: CI/CD
 

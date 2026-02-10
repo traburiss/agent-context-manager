@@ -4,7 +4,8 @@ import {
     Card, Button, Switch, Modal, 
     Form, Input, Message, Typography, 
     Empty, Popconfirm, 
-    Space
+    Space,
+    Affix
 } from '@arco-design/web-react';
 import { 
     IconPlus, IconFolder, IconFile, IconEdit
@@ -135,13 +136,15 @@ export default function Agents() {
 
   return (
     <div className="h-full overflow-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6">      
         <Typography.Title heading={4} className="m-0">
             {t('agents.title')}
         </Typography.Title>
-        <Button type="primary" icon={<IconPlus />} onClick={() => setIsModalOpen(true)}>
-          {t('agents.addAgent')}
-        </Button>
+        <Affix>          
+            <Button type="primary" icon={<IconPlus />} onClick={() => setIsModalOpen(true)}>
+            {t('agents.addAgent')}
+            </Button>
+        </Affix>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

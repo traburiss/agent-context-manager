@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../../stores/useStore';
-import { Table, Checkbox, Message, Typography, Button, Tooltip, Space, Dropdown, Menu, Input } from '@arco-design/web-react';
+import { Table, Checkbox, Message, Typography, Button, Tooltip, Space, Dropdown, Menu, Input, Grid } from '@arco-design/web-react';
+
+const { Row, Col } = Grid;
 import { Skill } from '../../../shared/types';
 import { IconFolder, IconDown, IconLink, IconStop } from '@arco-design/web-react/icon';
 
@@ -186,61 +188,72 @@ export const SkillList: React.FC<SkillListProps> = ({ repoId }) => {
   );
 
   const showSearchResult = searchText.trim().length > 0;
+  const { Text, Title } = Typography;
 
   if (!repoId) {
-    return <div className="p-8 text-center text-gray-500">{t('skills.selectRepoToView')}</div>;
+    return (
+      <Row justify="center" align="center" style={{ height: '100px', marginTop: '40px' }}>
+        <Col span={24} style={{ textAlign: 'center' }}>
+          <Text type="secondary">{t('skills.selectRepoToView')}</Text>
+        </Col>
+      </Row>
+    );
   }
 
   return (
     <div className="h-full flex flex-col">
-      <div className="mb-4 flex justify-between items-center gap-4">
-        <div className="flex-shrink-0">
-          <Typography.Title heading={6} style={{ margin: 0 }}>
-            {t('skills.skillsInRepo', { repo: repoId })}
-          </Typography.Title>
-          <Typography.Text type="secondary">
-            {showSearchResult
-              ? t('skills.searchResult', { count: filteredSkills.length, total: repoSkills.length })
-              : t('skills.skillsFound', { count: repoSkills.length })}
-          </Typography.Text>
-        </div>
+      <Space direction="vertical" size="large" className="mb-4" style={{ width: '100%' }}>
+        <Row justify="space-between" align="center">
+          <Col span={12}>
+            <Title heading={6} style={{ margin: 0 }}>
+              {t('skills.skillsInRepo', { repo: repoId })}
+            </Title>
+            <Text type="secondary">
+              {showSearchResult
+                ? t('skills.searchResult', { count: filteredSkills.length, total: repoSkills.length })
+                : t('skills.skillsFound', { count: repoSkills.length })}
+            </Text>
+          </Col>
 
-        <div className="flex items-center gap-2 flex-1 justify-end">
-          <Input.Search
-            placeholder={t('skills.searchPlaceholder')}
-            value={searchText}
-            onChange={setSearchText}
-            allowClear
-            style={{ maxWidth: 280 }}
-          />
+          <Col span={12} style={{ textAlign: 'right' }}>
+            <Space size="medium">
+              <Input.Search
+                placeholder={t('skills.searchPlaceholder')}
+                value={searchText}
+                onChange={setSearchText}
+                allowClear
+                style={{ width: 280 }}
+              />
 
-          {selectedRowKeys.length > 0 && (
-            <Space>
-              <span className="text-sm text-gray-500 mr-2">
-                {t('common.selectedItems', { count: selectedRowKeys.length })}
-              </span>
-              <Dropdown droplist={linkMenu} trigger="click">
-                <Button type="primary" size="small">
-                  <Space>
-                    <IconLink />
-                    {t('skills.linkTo')}
-                    <IconDown />
-                  </Space>
-                </Button>
-              </Dropdown>
-              <Dropdown droplist={unlinkMenu} trigger="click">
-                <Button status="danger" size="small">
-                  <Space>
-                    <IconStop />
-                    {t('skills.unlinkFrom')}
-                    <IconDown />
-                  </Space>
-                </Button>
-              </Dropdown>
+              {selectedRowKeys.length > 0 && (
+                <Space>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    {t('common.selectedItems', { count: selectedRowKeys.length })}
+                  </Text>
+                  <Dropdown droplist={linkMenu} trigger="click">
+                    <Button type="primary" size="small">
+                      <Space>
+                        <IconLink />
+                        {t('skills.linkTo')}
+                        <IconDown />
+                      </Space>
+                    </Button>
+                  </Dropdown>
+                  <Dropdown droplist={unlinkMenu} trigger="click">
+                    <Button status="danger" size="small">
+                      <Space>
+                        <IconStop />
+                        {t('skills.unlinkFrom')}
+                        <IconDown />
+                      </Space>
+                    </Button>
+                  </Dropdown>
+                </Space>
+              )}
             </Space>
-          )}
-        </div>
-      </div>
+          </Col>
+        </Row>
+      </Space>
 
       <div ref={tableContainerRef} className="flex-1 min-h-0">
         <Table

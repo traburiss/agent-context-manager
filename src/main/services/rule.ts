@@ -117,6 +117,11 @@ export class RuleService {
   }
 
   private generateId(name: string): string {
-    return name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const id = name.toLowerCase()
+      .replace(/[^a-z0-9\u4e00-\u9fa5]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    
+    return id || `rule-${Date.now()}`;
   }
 }

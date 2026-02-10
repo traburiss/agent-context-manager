@@ -76,8 +76,10 @@ export function registerIpcHandlers(appDataPath: string) {
   handle(IpcChannels.SetRuleContent, (id, content) => ruleService.setContent(id, content));
 
   // Rule Deploy
-  handle(IpcChannels.DeployRules, (ruleId, platformId) => ruleDeployService.deploy(ruleId, platformId));
+  // Rule Deploy
+  handle(IpcChannels.DeployRules, (ruleId, platformId, mode) => ruleDeployService.deploy(ruleId, platformId, mode));
   handle(IpcChannels.UndeployRules, (ruleId, platformId) => ruleDeployService.undeploy(ruleId, platformId));
+  handle(IpcChannels.CheckFileStatus, (platformId, ruleId) => ruleDeployService.checkFileStatus(platformId, ruleId));
 
   // App
   handle(IpcChannels.OpenExternal, async (url) => {

@@ -57,8 +57,9 @@ const api: IpcApi = {
   [IpcChannels.SetRuleContent]: (id, content) => ipcRenderer.invoke(IpcChannels.SetRuleContent, id, content),
 
   // Rule Deploy
-  [IpcChannels.DeployRules]: (ruleId, platformId) => ipcRenderer.invoke(IpcChannels.DeployRules, ruleId, platformId),
+  [IpcChannels.DeployRules]: (ruleId, platformId, mode) => ipcRenderer.invoke(IpcChannels.DeployRules, ruleId, platformId, mode),
   [IpcChannels.UndeployRules]: (ruleId, platformId) => ipcRenderer.invoke(IpcChannels.UndeployRules, ruleId, platformId),
+  [IpcChannels.CheckFileStatus]: (platformId, ruleId) => ipcRenderer.invoke(IpcChannels.CheckFileStatus, platformId, ruleId),
 
   // App
   [IpcChannels.OpenExternal]: (url) => ipcRenderer.invoke(IpcChannels.OpenExternal, url),

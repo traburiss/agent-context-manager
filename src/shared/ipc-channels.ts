@@ -47,7 +47,8 @@ export enum IpcChannels {
 
   // Rule Deploy
   DeployRules = 'rule:deploy',
-  UndeployRules = 'rule:undeploy', // Added
+  UndeployRules = 'rule:undeploy',
+  CheckFileStatus = 'rule:check-file-status', // Added
   
   // App
   OpenExternal = 'app:open-external',
@@ -102,8 +103,9 @@ export interface IpcApi {
   [IpcChannels.SetRuleContent]: (id: string, content: string) => Promise<void>;
 
   // Rule Deploy
-  [IpcChannels.DeployRules]: (ruleId: string, platformId: string) => Promise<void>;
+  [IpcChannels.DeployRules]: (ruleId: string, platformId: string, mode?: 'overwrite' | 'backup') => Promise<void>;
   [IpcChannels.UndeployRules]: (ruleId: string, platformId: string) => Promise<void>;
+  [IpcChannels.CheckFileStatus]: (platformId: string, ruleId: string) => Promise<{ status: 'linked' | 'conflict' | 'missing' | 'clean' }>;
   
   // App
   [IpcChannels.OpenExternal]: (url: string) => Promise<void>;

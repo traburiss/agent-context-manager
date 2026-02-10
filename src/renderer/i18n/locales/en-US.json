@@ -4,6 +4,7 @@
     "version": "v0.1.0",
     "loading": "Loading...",
     "save": "Save",
+    "saveSuccess": "Save Success",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -16,7 +17,9 @@
     "error": "Error",
     "warning": "Warning",
     "actions": "Actions",
-    "selectedItems": "Selected {{count}} items"
+    "selectedItems": "Selected {{count}} items",
+    "back": "back",
+    "openFolder": "Open Folder"
   },
   "nav": {
     "agents": "AI AGENT",
@@ -143,6 +146,17 @@
     "deleteSuccess": "Rule deleted",
     "saveFailed": "Failed to save rule",
     "loadFailed": "Failed to load rule content",
-    "deleteFailed": "Failed to delete rule"
+    "deleteFailed": "Failed to delete rule",
+    "deployedTo": "Linked to {{count}} agents",
+    "notDeployed": "Not linked",
+    "deployToAgents": "Link to Agents",
+    "deployed": "Rule linked",
+    "undeployed": "Rule unlinked",
+    "deployFailed": "Failed to link rule",
+    "loadContentFailed": "Failed to load rule content",
+    "conflictTitle": "File Conflict",
+    "conflictContent": "The target rule file already exists and is not managed by this application. How would you like to proceed?",
+    "overwrite": "Overwrite",
+    "backup": "Backup Old File"
   }
 }

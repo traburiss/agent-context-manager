@@ -60,6 +60,8 @@ export function SettingsModal({ visible, onCancel }: SettingsModalProps) {
     }
   }
 
+const { Title, Text } = Typography;
+
   return (
     <Modal
       title={t('settings.title')}
@@ -102,7 +104,7 @@ export function SettingsModal({ visible, onCancel }: SettingsModalProps) {
                 >
                    <Radio value="zh-CN">简体中文</Radio>
                    <Radio value="en-US">English</Radio>
-                </Radio.Group>
+                 </Radio.Group>
              </Form.Item>
           </Form>
         </Tabs.TabPane>
@@ -110,12 +112,12 @@ export function SettingsModal({ visible, onCancel }: SettingsModalProps) {
         <Tabs.TabPane key="about" title={t('settings.about')}>
            <div className="flex flex-col items-center justify-center h-[320px] pt-4 ">
               <img src="./icon.png" alt="Logo" className="w-16 h-16 mb-4" />
-              <Typography.Title heading={4} className="m-0">
+              <Title heading={4} style={{ margin: '0 0 8px 0' }}>
                   {t('common.appName')}
-              </Typography.Title>
-              <Typography.Text type="secondary" className="mb-6">
+              </Title>
+              <Text type="secondary" style={{ marginBottom: '24px' }}>
                   v{appVersion}
-              </Typography.Text>
+              </Text>
               
               <Space size="medium">
                   <Button 
@@ -124,7 +126,6 @@ export function SettingsModal({ visible, onCancel }: SettingsModalProps) {
                   >
                       GitHub
                   </Button>
-                  {/* TODO: Add real download link */}
                   <Button 
                     type="primary"
                     icon={<IconDownload />}
