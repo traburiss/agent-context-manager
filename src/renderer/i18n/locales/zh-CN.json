@@ -122,7 +122,9 @@
     "noSkillsUnlinked": "未取消链接任何技能",
     "linkTo": "链接到...",
     "unlinkFrom": "从...断开",
-    "recommendedRepos": "推荐仓库"
+    "recommendedRepos": "推荐仓库",
+    "searchPlaceholder": "搜索技能名称或描述...",
+    "searchResult": "搜索到 {{count}} / {{total}} 个技能"
   },
   "rules": {
     "title": "规则",

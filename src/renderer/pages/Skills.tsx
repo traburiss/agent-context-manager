@@ -53,7 +53,7 @@ export default function Skills() {
           </div>
           
           <div className="flex-[2] bg-bg-2 rounded-lg shadow-sm border border-border-2 flex flex-col min-w-0 overflow-hidden">
-             <div className="p-4 flex-1 overflow-auto">
+             <div className="p-4 flex-1 overflow-hidden flex flex-col">
                 <SkillList repoId={selectedRepoId} />
              </div>
           </div>

@@ -19,6 +19,48 @@ const DEFAULT_USER_CONFIG: UserConfig = {
   rules: []
 };
 
+const BUILTIN_PRESETS: PlatformPreset[] = [
+  {
+    id: 'antigravity',
+    name: 'Antigravity',
+    skillsDir: '${HOME}/.gemini/antigravity/skills',
+    rulesFile: '${HOME}/.gemini/GEMINI.md'
+  },
+  {
+    id: 'claude-code',
+    name: 'Claude Code',
+    skillsDir: '${HOME}/.claude/skills',
+    rulesFile: '${HOME}/.claude/CLAUDE.md'
+  },
+  {
+    id: 'opencode',
+    name: 'OpenCode',
+    skillsDir: '${HOME}/.config/opencode/skills',
+    rulesFile: '${HOME}/.config/opencode/rules/AGENTS.md'
+  },
+  {
+    id: 'cursor',
+    name: 'Cursor',
+    skillsDir: '${HOME}/.cursor/skills/', 
+    rulesFile: '${HOME}/.cursor/AGENTS.md',
+    description: 'AI code editor built on VS Code'
+  },
+  {
+    id: 'trae',
+    name: 'Trae',
+    skillsDir: '${HOME}/.trae/skills/',
+    rulesFile: '${HOME}/.trae/rules/global.md',
+    description: 'Adaptive AI IDE by ByteDance'
+  },
+  {
+    id: 'qoder',
+    name: 'Qoder',
+    skillsDir: '${HOME}/.qoder/skills/',
+    rulesFile: '${HOME}/.qoder/rules/global.md',
+    description: 'AI Coding Assistant'
+  }
+];
+
 export class ConfigService {
   private appDataPath: string;
   private systemConfigPath: string;
@@ -75,28 +117,7 @@ export class ConfigService {
   }
 
   private async loadInitialPresets(): Promise<PlatformPreset[]> {
-    const presetsDir = path.join(process.cwd(), 'resources', 'presets');
-    const builtInPresets: PlatformPreset[] = [];
-    
-    if (await fs.pathExists(presetsDir)) {
-      const files = await fs.readdir(presetsDir);
-      for (const file of files.filter(f => f.endsWith('.yaml'))) {
-        try {
-          const content = await fs.readFile(path.join(presetsDir, file), 'utf-8');
-          const data = yaml.load(content) as PlatformPreset;
-          builtInPresets.push({
-            ...data,
-            // We resolve variables when using them, but storing them as-is in config is better for portability?
-            // Actually, if we store them in config.yaml, we should probably store them with variables
-            // so they can be adapted if user moves config (though config is in home).
-            // Let's store as-is.
-          });
-        } catch (error) {
-          console.error(`Failed to load preset ${file}:`, error);
-        }
-      }
-    }
-    return builtInPresets;
+    return BUILTIN_PRESETS;
   }
 
   /**

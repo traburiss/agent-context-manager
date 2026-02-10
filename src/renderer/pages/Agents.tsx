@@ -134,7 +134,7 @@ export default function Agents() {
   };
 
   return (
-    <div>
+    <div className="h-full overflow-auto">
       <div className="flex items-center justify-between mb-6">
         <Typography.Title heading={4} className="m-0">
             {t('agents.title')}

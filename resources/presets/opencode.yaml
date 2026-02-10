@@ -1,3 +1,0 @@
-name: OpenCode
-skillsDir: '${HOME}/.config/opencode/skills'
-rulesFile: '${HOME}/.config/opencode/rules/AGENT.MD'

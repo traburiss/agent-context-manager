@@ -9,10 +9,11 @@ interface AddRepoModalProps {
 }
 
 const PRESET_REPOS = [
-    { name: 'awesome-claude-skills', url: 'https://github.com/ComposioHQ/awesome-claude-skills' },
-    { name: 'baoyu-skills', url: 'https://github.com/JimLiu/baoyu-skills.git' },
-    { name: 'anthropics-skills', url: 'https://github.com/anthropics/skills' },
-    { name: 'myclaude', url: 'https://github.com/cexll/myclaude' }
+    { name: 'awesome', url: 'https://github.com/ComposioHQ/awesome-claude-skills' },
+    { name: 'baoyu', url: 'https://github.com/JimLiu/baoyu-skills.git' },
+    { name: 'anthropics', url: 'https://github.com/anthropics/skills' },
+    { name: 'myclaude', url: 'https://github.com/cexll/myclaude' },
+    { name: 'openclaw', url: 'https://github.com/openclaw/skills' }
 ];
 
 export const AddRepoModal: React.FC<AddRepoModalProps> = ({ visible, onCancel }) => {
@@ -72,7 +73,7 @@ export const AddRepoModal: React.FC<AddRepoModalProps> = ({ visible, onCancel })
             visible={visible}
             footer={null}
             onCancel={onCancel}
-            style={{ width: 600 }}
+            style={{ width: 800 }}
         >
             
             <Form form={form} layout="vertical">

@@ -47,7 +47,7 @@ export function Layout() {
       </Header>
 
       <Content className="p-0 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-auto pl-6 pr-6 pb-6">
+        <div className="flex-1 overflow-hidden pl-6 pr-6 pb-6">
           <Outlet />
         </div>
       </Content>

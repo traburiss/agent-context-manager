@@ -115,7 +115,9 @@
     "noSkillsUnlinked": "No skills were unlinked",
     "linkTo": "Link to...",
     "unlinkFrom": "Unlink from...",
-    "recommendedRepos": "Recommended Repositories"
+    "recommendedRepos": "Recommended Repositories",
+    "searchPlaceholder": "Search skills by name or description...",
+    "searchResult": "Showing {{count}} / {{total}} skills"
   },
   "rules": {
     "title": "Rules",
