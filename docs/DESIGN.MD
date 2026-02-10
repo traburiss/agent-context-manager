@@ -75,57 +75,43 @@ Windows 创建符号链接需要管理员权限，采用以下方案：
 
 ### 2. 配置文件方案
 
-采用 **YAML** 格式，人类友好且易于版本控制。配置文件结构如下：
+采用 **YAML** 格式，实施 **分层存储策略**。
 
-```text
-<Manager Base Dir>/
-├── config/                  # 配置文件夹
-│   ├── config.yaml          # 全局配置
-│   ├── platforms/           # AI Agent配置
-│   │   ├── antigravity.yaml
-│   │   ├── claude-code.yaml
-│   │   └── ...
-│   └── presets/             # 平台预设模板
-│       ├── antigravity.yaml
-│       └── ...
-├── skills/                  # 拉取的技能仓库
-│   ├── <repo_name>/
-│   └── ...
-└── rules/                   # 规则文件
-    ├── global.md
-    └── ...
-```
+#### 层级 1: 系统配置 (System Config)
 
-#### config/config.yaml 示例
+* **位置**: `%APPDATA%/AgentContextManager/config.yaml` (Windows)
+* **内容**:
+  * `baseDir`: 用户数据存储目录
+  * `language`: 界面语言
+  * `theme`: 界面主题
+  * `presets`: 自定义 Agent 预设
 
-```yaml
-version: 1
-git_path: "git"  # 可选，自定义 git 路径
-```
+#### 层级 2: 用户配置 (User Config)
 
-#### config/platforms/antigravity.yaml 示例
+* **位置**: `<Manager Base Dir>/config/`
+* **文件**:
+    1. `ai-agent.yaml`: 定义 AI Agent 实例及其关联的 Skills/Rules
+    2. `skills.yaml`: 定义 Skills Git 仓库源元数据
+    3. `rules.yaml`: 定义 Rules 文件元数据
+* **特性**:
+  * **头部注释**: 自动注入详细字段说明，方便用户手动编辑
+  * **可移植**: 随 Base Dir 移动
+
+#### config/ai-agent.yaml 示例
 
 ```yaml
-name: Antigravity
-skills_dir: "C:/Users/xxx/.gemini/antigravity/skills"
-rules_file: "C:/Users/xxx/.gemini/antigravity/AGENTS.MD"
-enabled: true
-linked_skills:
-  - "awesome-skills/frontend-design"
-  - "awesome-skills/pdf"
-linked_rules:
-  - "global"
+# ===================================================================
+# AI AGENT CONFIGURATION
+# 定义 AI Agent 实例
+# ===================================================================
+
+agents:
+  - id: "uuid-1"
+    name: "Antigravity"
+    platform: "vscode"
+    enabled: true
+    skills:
+      - "frontend-design"
+    rules:
+      - "global-standards"
 ```
-
-#### config/presets/ 预设模板
-
-内置常见 AI Agent的默认路径配置，用户可一键导入：
-
-```yaml
-# config/presets/antigravity.yaml
-name: Antigravity
-skills_dir: "${HOME}/.gemini/antigravity/skills"
-rules_file: "${HOME}/.gemini/antigravity/AGENTS.MD"
-```
-
-支持变量替换：`${HOME}`, `${APPDATA}`, `${XDG_CONFIG_HOME}` 等

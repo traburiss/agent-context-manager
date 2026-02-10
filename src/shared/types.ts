@@ -4,6 +4,8 @@ export interface Platform {
   skillsDir: string;
   rulesFile: string;
   enabled: boolean;
+  linkedSkills?: string[];
+  linkedRules?: string[];
 }
 
 export interface SkillRepo {
@@ -29,8 +31,10 @@ export interface Skill {
 export interface Rule {
   id: string;
   name: string;
+  description?: string;
   localPath: string;
   linkedPlatforms: string[];
+  createdAt: string;
 }
 
 export interface UpdateCheckResult {
@@ -39,4 +43,44 @@ export interface UpdateCheckResult {
   behindCount: number;
   aheadCount: number;
   error?: string;
+}
+
+
+export interface SystemConfig {
+  baseDir: string;
+  language?: 'zh-CN' | 'en-US';
+  theme?: 'light' | 'dark' | 'system';
+  presets?: PlatformPreset[];
+  version: number;
+}
+
+export interface UserConfig {
+  agents: PlatformConfig[]; // from ai-agent.yaml
+  skills: SkillRepo[];     // from skills.yaml
+  rules: Rule[];           // from rules.yaml
+}
+
+/**
+ * @deprecated Use SystemConfig instead
+ */
+export interface GlobalConfig {
+  version: number;
+  gitPath?: string;
+  theme?: 'light' | 'dark' | 'system';
+  language?: 'zh-CN' | 'en-US';
+  skillsRepos?: string[];
+}
+
+export interface PlatformConfig {
+  id: string;
+  name: string;
+  skillsDir: string;
+  rulesFile: string;
+  enabled: boolean;
+  linkedSkills: string[];
+  linkedRules: string[];
+}
+
+export interface PlatformPreset extends Omit<PlatformConfig, 'enabled' | 'linkedSkills' | 'linkedRules'> {
+  description?: string;
 }

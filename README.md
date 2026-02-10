@@ -52,19 +52,16 @@ xattr -cr /Applications/AgentContextManager.app
 
 ## 配置文件
 
-所有配置存储在 `<Manager Base Dir>/` 下，采用 YAML 格式：
+本工具采用 **分层存储策略**：
 
-```text
-<Manager Base Dir>/
-├── config/                  # 配置文件夹
-│   ├── config.yaml          # 全局配置
-│   ├── platforms/           # AI Agent配置
-│   └── presets/             # 平台预设模板
-├── skills/                  # 拉取的技能仓库
-└── rules/                   # 规则文件
-```
+1. **系统配置**：`~/.config/acm/config.yaml`
+    - 存储 Base Dir 路径、语言、主题、预设模板等。
+2. **用户数据**：`<Manager Base Dir>/config/`
+    - `ai-agent.yaml`: Agent 实例与 Skills/Rules 关联
+    - `skills.yaml`: Skill 仓库源
+    - `rules.yaml`: Rule 文件元数据
 
-详见 [DESIGN.MD](./DESIGN.MD) 获取完整配置说明。
+详见 [配置系统设计](./docs/design/05_config.md) 获取完整说明。
 
 ## 开发
 

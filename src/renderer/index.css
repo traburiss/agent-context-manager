@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-color: var(--color-bg-1);
+  color: var(--color-text-1);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+}
+
+/* Rule Editor Styles */
+.rule-editor-textarea.arco-textarea-wrapper {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.rule-editor-textarea .arco-textarea {
+  flex: 1 !important;
+  min-height: 0 !important;
+}

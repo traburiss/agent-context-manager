@@ -120,41 +120,34 @@ function resolvePathVariables(path: string): string {
 
 ```typescript
 // src/main/services/platform.ts
+import { ConfigurationService } from './config/ConfigurationService';
 
 export class PlatformService {
-  private configDir: string;
-
-  constructor(baseDir: string) {
-    this.configDir = path.join(baseDir, 'config', 'platforms');
-  }
+  constructor(private configService: ConfigurationService) {}
 
   async list(): Promise<Platform[]> {
-    const files = await fs.readdir(this.configDir);
-    const platforms: Platform[] = [];
-
-    for (const file of files.filter(f => f.endsWith('.yaml'))) {
-      const content = await fs.readFile(path.join(this.configDir, file), 'utf-8');
-      const data = yaml.load(content) as Platform;
-      data.id = path.basename(file, '.yaml');
-      platforms.push(data);
-    }
-
-    return platforms;
+    const config = await this.configService.getUserConfig();
+    return config.agents;
   }
 
   async create(platform: Omit<Platform, 'id'>): Promise<Platform> {
-    const id = this.generateId(platform.name);
-    const filePath = path.join(this.configDir, `${id}.yaml`);
+    const config = await this.configService.getUserConfig();
+    
+    const newPlatform: Platform = {
+      ...platform,
+      id: this.generateId(platform.name)
+    };
 
-    const data: Platform = { ...platform, id };
-    await fs.writeFile(filePath, yaml.dump(data));
-
-    return data;
+    config.agents.push(newPlatform);
+    await this.configService.saveUserConfig();
+    
+    return newPlatform;
   }
 
   async delete(id: string): Promise<void> {
-    const filePath = path.join(this.configDir, `${id}.yaml`);
-    await fs.remove(filePath);
+    const config = await this.configService.getUserConfig();
+    config.agents = config.agents.filter(p => p.id !== id);
+    await this.configService.saveUserConfig();
   }
 }
 ```

@@ -1,112 +1,185 @@
 # Agent Context Manager 开发任务计划
 
-## Phase 1: 项目初始化
+## Phase 1: 项目初始化 ✅
 
-- [ ] 使用 Vite + Electron 模板初始化项目
-- [ ] 配置 TypeScript 5.9 严格模式
-- [ ] 配置 Tailwind CSS v4
-- [ ] 配置 ESLint + Prettier
-- [ ] 创建基础目录结构
+- [x] 使用 Vite + Electron 模板初始化项目
+- [x] 配置 TypeScript 5.9 严格模式
+- [x] 配置 Tailwind CSS v4
+- [x] 配置 ESLint + Prettier
+- [x] 创建基础目录结构
 
-## Phase 2: 核心服务层
+## Phase 2: 核心服务层 ✅
 
-### 2.1 配置服务
+> [!NOTE]
+> 核心服务正在根据 [Design 05_config](docs/design/05_config.md) 的**分层存储方案**进行重构。
 
-- [ ] 实现 `ConfigService` 类
-- [ ] YAML 配置读写
-- [ ] 环境变量解析
-- [ ] 内置预设加载
+### 2.1 配置服务 (ConfigService) ✅
 
-### 2.2 AI Agent服务
+- [x] **初始 ConfigService 实现**
+- [x] **重构：实现分层配置逻辑**
+  - [x] `SystemConfig` (App Data) 与 `UserConfig` (Base Dir) 分离
+  - [x] 异步去抖 (Debounce) 持久化
+  - [x] 配置文件头部注释注入
+- [x] **实现启动流程支持**
+  - [x] `checkGitInstalled`
+  - [x] `resolveVariables` (${HOME}, ${APPDATA} 等)
+- [x] **配置迁移**
+  - [x] 迁移至 `~/.config/acm/config.yaml`
+  - [x] 预设 (Presets) 存入系统配置
 
-- [ ] 实现 `PlatformService` 类
-- [ ] AI Agent CRUD 操作
-- [ ] 路径变量替换
+### 2.2 AI Agent服务 (PlatformService) ✅
 
-### 2.3 Git 服务
+> 参考: [Design 02_platform](docs/design/02_platform.md)
 
-- [ ] 实现 `GitService` 类
-- [ ] Git 检测
-- [ ] 仓库克隆/拉取
-- [ ] URL 规范化
-- [ ] 更新检查 (`checkForUpdates`/`checkAllUpdates`)
+- [x] 初始 `PlatformService` 实现 (Old)
+- [x] **重构：适配 `ConfigService`**
+  - [x] `list()`: 从 `ConfigService.getUserConfig().agents` 读取
+  - [x] `create/update/delete`: 调用 `ConfigService.setUserConfig` 更新 `.agents` 数组
+  - [x] 移除旧的文件系统 (`platforms/*.yaml`) 读取逻辑
+- [x] **实现预设 (Presets) 逻辑**
+  - [x] 加载内置 `resources/presets`
+  - [x] 实现 `getPresets()` 方法 (Moved to ConfigService)
 
-### 2.4 符号链接服务
+### 2.3 Skills 服务 (SkillService & GitService) ✅
 
-- [ ] 实现 `SymlinkService` 类
-- [ ] Windows junction 创建
-- [ ] 权限检测与提示
+> 参考: [Design 03_skills](docs/design/03_skills.md)
 
-### 2.5 Rules 服务
+- [x] 初始 `GitService` 实现 (Old)
+- [x] **重构：SkillRepo 管理**
+  - [x] `GitService`: 负责 clone/pull/check-update
+  - [x] 仓库元数据存储于 `ConfigService.getUserConfig().skills`
+- [x] **实现 Skill 扫描逻辑**
+  - [x] 创建 `SkillService`
+  - [x] 实现 `scanSkills(repoPath)`: 递归查找 `SKILL.MD`
+  - [x] 解析 `SKILL.MD` 提取描述信息
 
-- [ ] 实现 `RuleService` 类
-- [ ] 实现 `RuleDeployService` 类
-- [ ] 内容合并策略
+### 2.4 Rules 服务 (RuleService) ✅
 
-## Phase 3: IPC 通信层
+> 参考: [Design 04_rules](docs/design/04_rules.md)
 
-- [ ] 定义 IPC Channel 常量
-- [ ] 实现 Main 进程 IPC 处理器
-- [ ] 实现 Renderer 进程 IPC 客户端
-- [ ] 类型安全的 IPC 封装
+- [x] 初始 `RuleService` 实现 (Old)
+- [x] **重构：适配 `ConfigService`**
+  - [x] `list()`: 从 `ConfigService.getUserConfig().rules` 读取
+  - [x] `create/delete`: 更新配置中的 Rules 列表
+  - [x] 保持 `.md` 文件存储在 `rules/` 目录下
+- [x] **实现 Rule 部署逻辑 (RuleDeployService)**
+  - [x] 实现标记生成 `<!-- SKILLS_MANAGER_RULE_START:id -->`
+  - [x] 实现 `deploy`: 读取目标文件 -> 清理旧内容 -> 注入新内容 -> 保存
+  - [x] 实现 `undeploy`: 清理标记内容
 
-## Phase 4: 前端界面
+### 2.5 符号链接服务 (SymlinkService) ✅
 
-### 4.1 启动流程
+- [x] 实现 `SymlinkService` 类
+- [x] Windows junction 创建/删除
+- [x] 权限检测与提示
 
-- [ ] 权限检测页面
-- [ ] Git 检测页面
-- [ ] 初始化向导
+## Phase 3: IPC 通信层 ✅
 
-### 4.2 主界面框架
+- [x] 定义 IPC Channel 常量
+- [x] **完善 Main 进程 IPC 处理器**
+  - [x] Config IPC (`config:*`)
+  - [x] Platform IPC (`platform:*`)
+  - [x] Skills/Repo IPC (`repo:*`, `skill:*`)
+  - [x] Rule IPC (`rule:*`)
+- [x] **完善 Renderer 进程 IPC 客户端**
+  - [x] `window.api` 类型定义
+  - [x] 补全所有设计文档中定义的接口
 
-- [ ] Tab 导航组件
-- [ ] 全局状态管理 (Zustand)
+## Phase 4: 前端界面 ✅
 
-### 4.3 AI Agent管理
+### 4.1 启动流程 ✅
 
-- [ ] AI Agent列表页
-- [ ] 添加AI Agent对话框
-- [ ] 预设选择器
+> 参考: [Design 01_startup](docs/design/01_startup.md)
 
-### 4.4 Skills 管理
+- [x] Git 环境检测
+- [x] 初始化向导 (Base Dir 选择)
+- [x] 国际化 (i18n) 支持
 
-- [ ] 仓库列表页
-- [ ] 添加仓库对话框
-- [ ] 仓库详情页
-- [ ] Skill 列表组件
-- [ ] AI Agent部署开关
+### 4.2 主界面框架 ✅
 
-### 4.5 Rules 管理
+> 参考: [Design 07_ui_layout](docs/design/07_ui_layout.md)
 
-- [ ] Rules 列表页
-- [ ] 新建 Rule 对话框
-- [ ] Rule 编辑页
-- [ ] Markdown 编辑器
-- [ ] AI Agent部署开关
+- [x] **Layout 组件**
+  - [x] 顶部导航栏 (Header)
+    - [x] 左侧: Tabs (AI AGENT | SKILLS | RULES)
+    - [x] 右侧: 设置按钮
+  - [x] 内容区域 (Content Outlet)
+- [x] **设置 (Settings) 模块**
+  - [x] 设置弹窗/抽屉组件
+  - [x] **通用设置**
+    - [x] Base Dir 重设/切换
+    - [x] 主题切换 (Light/Dark/System)
+    - [x] 语言切换 (zh-CN/en-US)
+  - [x] **关于信息**
+    - [x] 版本号显示
+    - [x] GitHub 链接
+    - [x] 下载页面链接
+- [x] **全局状态 (useStore)**
+  - [x] 集成 Platform, Skills, Rules 状态
+
+### 4.3 AI Agent管理 (Agents Tab) ✅
+
+> 参考: [Design 02_platform](docs/design/02_platform.md)
+
+- [x] **Agent 列表视图**
+  - [x] 展示 Agent 卡片 (包含 Skills/Rules 路径状态)
+  - [x] 绑定/解绑 Skills 概览 (基础信息展示)
+- [x] **新建 Agent 对话框**
+  - [x] 预设选择器 (Tab: 预设 / 自定义)
+  - [x] 表单验证
+
+### 4.4 Skills 管理 (Skills Tab)
+
+> 参考: [Design 03_skills](docs/design/03_skills.md)
+
+- [x] **仓库列表视图**
+  - [x] 展示已添加的 Skill Repos
+  - [x] 状态指示器 (Up-to-date, Behind, Confirming)
+  - [x] 操作按钮: 更新, 删除, 详情
+- [x] **添加仓库对话框**
+  - [x] 输入 URL / 选择本地路径
+- [x] **Skill 详情/部署页**
+  - [x] 展示仓库内扫描到的 Skills
+  - [x] 部署矩阵: Skill x Agent (Checkbox)
+  - [x] 触发 `skill:link` / `skill:unlink`
+
+### 4.5 Rules 管理 (Rules Tab) ✅
+
+> 参考: [Design 04_rules](docs/design/04_rules.md)
+
+- [x] **Rules 列表视图**
+  - [x] 展示 Rule 文件列表
+  - [x] 部署状态概览
+- [x] **Rule 编辑器**
+  - [x] Markdown 编辑预览
+  - [x] 部署配置 (选择生效的 Agents)
 
 ## Phase 5: CI/CD
 
-- [ ] 创建 GitHub Actions 工作流
-- [ ] 配置 electron-builder
-- [ ] Windows 签名配置
-- [ ] 自动发布 Release
+> 参考: [Design 06_cicd](docs/design/06_cicd.md)
+
+- [ ] GitHub Actions 工作流配置
+- [ ] electron-builder 配置 (Win/Mac/Linux)
+- [ ] Release 自动发布
 
 ## Phase 6: 测试与文档
 
-- [ ] 单元测试 (Vitest)
-- [ ] E2E 测试 (Playwright)
-- [ ] 完善 README.md
-- [ ] 用户使用文档
+- [ ] **单元测试**
+  - [x] ConfigService (Done)
+  - [x] PlatformService (Done)
+  - [x] SkillService (Done)
+  - [x] RuleService / RuleDeployService (Done)
+- [ ] **文档**
+  - [ ] 用户手册 (README.md)
+  - [ ] 开发贡献指南
 
 ## 里程碑
 
-| 阶段 | 预计工期 | 交付物 |
-|------|---------|--------|
-| Phase 1 | 1 天 | 项目骨架 |
-| Phase 2 | 3 天 | 核心服务 |
-| Phase 3 | 1 天 | IPC 通信 |
-| Phase 4 | 5 天 | 完整界面 |
-| Phase 5 | 1 天 | 自动构建 |
-| Phase 6 | 2 天 | 测试文档 |
-| **总计** | **~13 天** | 可发布版本 |
+| 阶段 | 状态 | 交付物 |
+| :--- | :--- | :--- |
+| Phase 1 | ✅ 完成 | 项目骨架 |
+| Phase 2 | ✅ 完成 | 核心服务 (分离存储重构) |
+| Phase 3 | ✅ 完成 | IPC 通信 |
+| Phase 4 | 🚧 进行中 | 完整界面 |
+| Phase 5 | ⏳ 等待 | 自动构建 |
+| Phase 6 | ⏳ 等待 | 测试文档 |
