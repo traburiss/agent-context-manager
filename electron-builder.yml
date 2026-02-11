@@ -15,7 +15,7 @@ win:
   target:
     - target: nsis
       arch: [x64]
-  icon: resources/icon.png
+  icon: resources/icon.ico
   requestedExecutionLevel: requireAdministrator
 
 mac:
@@ -36,8 +36,8 @@ linux:
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
-  installerIcon: resources/icon.png
-  uninstallerIcon: resources/icon.png
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico
 
 dmg:
   contents:
