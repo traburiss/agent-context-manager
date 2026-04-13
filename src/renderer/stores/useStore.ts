@@ -33,6 +33,7 @@ interface AppState {
   // Skills
   fetchSkills: () => Promise<void>;
   addRepo: (url: string, localPath?: string) => Promise<void>;
+  addLocalRepo: (localPath: string) => Promise<void>;
   deleteRepo: (id: string) => Promise<void>;
   checkRepoUpdate: (id: string) => Promise<void>;
   linkSkill: (skillId: string, platformId: string) => Promise<void>;
@@ -180,6 +181,20 @@ export const useStore = create<AppState>((set, get) => ({
         await window.api[IpcChannels.CloneRepo](url, localPath);
         await get().fetchUserConfig(); // Refresh repos list
         await get().fetchSkills();     // Refresh skills list
+    } catch (error) {
+        set({ error: (error as Error).message });
+        throw error;
+    } finally {
+        set({ isLoading: false });
+    }
+  },
+
+  addLocalRepo: async (localPath) => {
+    try {
+        set({ isLoading: true });
+        await window.api[IpcChannels.AddLocalRepo](localPath);
+        await get().fetchUserConfig();
+        await get().fetchSkills();
     } catch (error) {
         set({ error: (error as Error).message });
         throw error;

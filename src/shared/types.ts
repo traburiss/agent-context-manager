@@ -11,12 +11,13 @@ export interface Platform {
 export interface SkillRepo {
   id: string;
   name: string;
-  url: string;
+  url?: string;
   localPath: string;
   lastUpdated: string;
   updateStatus?: 'checking' | 'up-to-date' | 'behind' | 'error';
   behindCount?: number;
   checkError?: string;
+  type?: 'git' | 'local';
 }
 
 export interface Skill {

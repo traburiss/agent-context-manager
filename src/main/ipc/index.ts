@@ -51,8 +51,9 @@ export function registerIpcHandlers(appDataPath: string) {
   // Git
   handle(IpcChannels.CheckGitInstalled, () => gitService.checkGitInstalled());
   handle(IpcChannels.CloneRepo, (url, targetDir) => gitService.clone(url, targetDir));
+  handle(IpcChannels.AddLocalRepo, (localPath) => gitService.addLocalRepo(localPath));
   handle(IpcChannels.PullRepo, (repoId) => gitService.pull(repoId));
-  handle(IpcChannels.NormalizeUrl, async (url) => gitService.normalizeGitUrl(url)); 
+  handle(IpcChannels.NormalizeUrl, async (url) => gitService.normalizeGitUrl(url));
   handle(IpcChannels.CheckUpdates, (repoId) => gitService.checkUpdates(repoId));
   handle(IpcChannels.DeleteRepo, (repoId) => gitService.delete(repoId));
 

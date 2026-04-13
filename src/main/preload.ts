@@ -32,6 +32,7 @@ const api: IpcApi = {
   // Git
   [IpcChannels.CheckGitInstalled]: () => ipcRenderer.invoke(IpcChannels.CheckGitInstalled),
   [IpcChannels.CloneRepo]: (url, targetDir) => ipcRenderer.invoke(IpcChannels.CloneRepo, url, targetDir),
+  [IpcChannels.AddLocalRepo]: (localPath) => ipcRenderer.invoke(IpcChannels.AddLocalRepo, localPath),
   [IpcChannels.PullRepo]: (repoId) => ipcRenderer.invoke(IpcChannels.PullRepo, repoId),
   [IpcChannels.NormalizeUrl]: (url) => ipcRenderer.invoke(IpcChannels.NormalizeUrl, url),
   [IpcChannels.CheckUpdates]: (repoId) => ipcRenderer.invoke(IpcChannels.CheckUpdates, repoId),

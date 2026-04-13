@@ -21,10 +21,11 @@ export enum IpcChannels {
   // Git
   CheckGitInstalled = 'git:check-installed',
   CloneRepo = 'git:clone',
+  AddLocalRepo = 'git:add-local',
   PullRepo = 'git:pull',
   NormalizeUrl = 'git:normalize-url',
   CheckUpdates = 'git:check-updates',
-  DeleteRepo = 'git:delete', // Added
+  DeleteRepo = 'git:delete',
 
   // Skill
   ListSkills = 'skill:list',
@@ -77,11 +78,12 @@ export interface IpcApi {
 
   // Git
   [IpcChannels.CheckGitInstalled]: () => Promise<boolean>;
-  [IpcChannels.CloneRepo]: (url: string, targetDir?: string) => Promise<SkillRepo>; // Updated return type
-  [IpcChannels.PullRepo]: (repoId: string) => Promise<void>; // Updated arg
+  [IpcChannels.CloneRepo]: (url: string, targetDir?: string) => Promise<SkillRepo>;
+  [IpcChannels.AddLocalRepo]: (localPath: string) => Promise<SkillRepo>;
+  [IpcChannels.PullRepo]: (repoId: string) => Promise<void>;
   [IpcChannels.NormalizeUrl]: (url: string) => Promise<string>;
-  [IpcChannels.CheckUpdates]: (repoId: string) => Promise<UpdateCheckResult>; // Updated arg
-  [IpcChannels.DeleteRepo]: (repoId: string) => Promise<void>; // Added
+  [IpcChannels.CheckUpdates]: (repoId: string) => Promise<UpdateCheckResult>;
+  [IpcChannels.DeleteRepo]: (repoId: string) => Promise<void>;
 
   // Skill
   [IpcChannels.ListSkills]: () => Promise<Skill[]>;

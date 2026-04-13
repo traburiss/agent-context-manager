@@ -124,7 +124,12 @@
     "unlinkFrom": "Unlink from...",
     "recommendedRepos": "Recommended Repositories",
     "searchPlaceholder": "Search skills by name or description...",
-    "searchResult": "Showing {{count}} / {{total}} skills"
+    "searchResult": "Showing {{count}} / {{total}} skills",
+    "cloneFromGit": "Clone from Git",
+    "addLocalPath": "Add Local Path",
+    "localPath": "Local Path",
+    "localPathPlaceholder": "/path/to/local/skills",
+    "localPathRequired": "Please enter a local path"
   },
   "rules": {
     "title": "Rules",

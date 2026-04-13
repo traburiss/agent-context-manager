@@ -131,7 +131,12 @@
     "unlinkFrom": "从...断开",
     "recommendedRepos": "推荐仓库",
     "searchPlaceholder": "搜索技能名称或描述...",
-    "searchResult": "搜索到 {{count}} / {{total}} 个技能"
+    "searchResult": "搜索到 {{count}} / {{total}} 个技能",
+    "cloneFromGit": "从 Git 克隆",
+    "addLocalPath": "添加本地路径",
+    "localPath": "本地路径",
+    "localPathPlaceholder": "/path/to/local/skills",
+    "localPathRequired": "请输入本地路径"
   },
   "rules": {
     "title": "规则",

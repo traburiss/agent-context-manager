@@ -184,6 +184,39 @@ export class GitService {
         return newRepo;
     }
 
+    async addLocalRepo(localPath: string): Promise<SkillRepo> {
+        const resolvedPath = path.resolve(localPath);
+
+        if (!await fs.pathExists(resolvedPath)) {
+            throw new Error(`Directory ${resolvedPath} does not exist`);
+        }
+
+        const stat = await fs.stat(resolvedPath);
+        if (!stat.isDirectory()) {
+            throw new Error(`${resolvedPath} is not a directory`);
+        }
+
+        const userConfig = await this.configService.getUserConfig();
+        const repoName = path.basename(resolvedPath);
+
+        if (userConfig.skills.some(s => s.localPath === resolvedPath || s.id === repoName)) {
+            throw new Error(`Repository ${repoName} or path already exists`);
+        }
+
+        const newRepo: SkillRepo = {
+            id: repoName,
+            name: repoName,
+            localPath: resolvedPath,
+            lastUpdated: new Date().toISOString(),
+            type: 'local'
+        };
+
+        userConfig.skills.push(newRepo);
+        await this.configService.setUserConfig({ skills: userConfig.skills });
+
+        return newRepo;
+    }
+
     async pull(id: string): Promise<void> {
         const userConfig = await this.configService.getUserConfig();
         const repo = userConfig.skills.find(s => s.id === id);
