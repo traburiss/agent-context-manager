@@ -57,7 +57,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
-          path: release/*.{exe,dmg,AppImage}
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.AppImage
+          if-no-files-found: error
 
   release:
     needs: build
