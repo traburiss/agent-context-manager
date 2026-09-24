@@ -11,25 +11,24 @@ files:
   - "package.json"
   - "resources/**/*"
 
+artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+
 win:
   target:
-    - target: nsis
-      arch: [x64]
+    - nsis
   icon: resources/icon.ico
   requestedExecutionLevel: requireAdministrator
 
 mac:
   target:
-    - target: dmg
-      arch: [x64, arm64]
+    - dmg
   icon: resources/icon.png
   hardenedRuntime: true
   gatekeeperAssess: false
 
 linux:
   target:
-    - target: AppImage
-      arch: [x64]
+    - AppImage
   icon: resources/icon.png
   category: Development
 
