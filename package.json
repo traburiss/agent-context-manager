@@ -1,6 +1,6 @@
 {
   "name": "agent-context-manager",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "跨平台 AI Agent 上下文 (Skills/Rules) 管理工具",
   "type": "module",
   "main": "out/main/index.js",
